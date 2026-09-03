@@ -416,7 +416,7 @@ export const api = {
   // CSV Attendance Export (Goal 7)
   downloadSessionCsv: async (sessionId: number) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`/api/sessions/${sessionId}/export-csv`, {
+    const res = await fetch(`${API_BASE}/sessions/${sessionId}/export-csv`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!res.ok) {
