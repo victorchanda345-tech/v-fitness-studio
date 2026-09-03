@@ -5,14 +5,15 @@ Fill this in and commit it. This is the first file we open.
 ## Links
 
 - **GitHub repository:** https://github.com/victorchanda345-tech/v-fitness-studio
-- **Live application:** http://localhost:5173 (Local dev server) / Backend: http://localhost:3000
+- **Live application:** Pending Vercel Frontend / Backend API: https://v-fitness-studio.onrender.com
 
 ## Notes for the reviewer
 
 - **Studio**: **V Fitness Studio** — Boutique fitness & studio class booking system.
-- **Backend**: Express 5 + TypeScript running with tsx on `http://localhost:3000`. Healthcheck available at `http://localhost:3000/api/health`.
-- **Frontend**: React 18 + Vite with TypeScript running on `http://localhost:5173`. Proxies `/api/*` to `http://localhost:3000`.
+- **Backend API**: Live on Render at `https://v-fitness-studio.onrender.com`. Healthcheck available at `https://v-fitness-studio.onrender.com/api/health`.
+- **Note on Free-Tier Sleeping**: The backend is hosted on Render's free tier. Free tier instances automatically spin down/sleep when idle and can take 30–60 seconds to wake up on the first request. Subsequent requests are fast.
 - **Database**: PostgreSQL hosted on Supabase with Drizzle ORM. Strict relational foreign keys with `CASCADE` deletes, uniqueness constraints on co-instructors `(session_id, instructor_id)`, and immutable audit log tables.
+- **Frontend**: React 18 + Vite with TypeScript. Connected to the live backend API.
 - **Production Build**: Verified with `npm run build` in `client/` (0 errors, 0 warnings).
 
 ## Demo credentials
