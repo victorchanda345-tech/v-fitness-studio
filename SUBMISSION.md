@@ -5,15 +5,17 @@ Fill this in and commit it. This is the first file we open.
 ## Links
 
 - **GitHub repository:** https://github.com/victorchanda345-tech/v-fitness-studio
-- **Live application:** Pending Vercel Frontend / Backend API: https://v-fitness-studio.onrender.com
+- **Live application:** https://v-fitness-studio.vercel.app
+- **Backend API:** https://v-fitness-studio.onrender.com
 
 ## Notes for the reviewer
 
 - **Studio**: **V Fitness Studio** — Boutique fitness & studio class booking system.
+- **Live Application**: Deployed on Vercel at `https://v-fitness-studio.vercel.app`.
 - **Backend API**: Live on Render at `https://v-fitness-studio.onrender.com`. Healthcheck available at `https://v-fitness-studio.onrender.com/api/health`.
 - **Note on Free-Tier Sleeping**: The backend is hosted on Render's free tier. Free tier instances automatically spin down/sleep when idle and can take 30–60 seconds to wake up on the first request. Subsequent requests are fast.
 - **Database**: PostgreSQL hosted on Supabase with Drizzle ORM. Strict relational foreign keys with `CASCADE` deletes, uniqueness constraints on co-instructors `(session_id, instructor_id)`, and immutable audit log tables.
-- **Frontend**: React 18 + Vite with TypeScript. Connected to the live backend API.
+- **Frontend**: React 18 + Vite with TypeScript running on Vercel edge network with SPA rewrites.
 - **Production Build**: Verified with `npm run build` in `client/` (0 errors, 0 warnings).
 
 ## Demo credentials
@@ -33,7 +35,7 @@ Fill this in and commit it. This is the first file we open.
 | Frontend | React 18 + Vite (TypeScript) + Vanilla CSS Glassmorphism | Fast bundling, reactive component tree, type-safe API client, modern dark-mode responsive aesthetics |
 | Backend | Node.js + Express 5 (TypeScript) | Lightweight, flexible middleware pipeline with stateless JWT auth, role-based authorization |
 | Database | PostgreSQL (Supabase) + Drizzle ORM | Native SQL relational modeling, strict FK cascades, zero runtime ORM overhead, full type safety |
-| Hosting | Supabase (DB) | Cloud-hosted PostgreSQL with connection pooling |
+| Hosting | Vercel (Frontend SPA) + Render (Node.js API) + Supabase (PostgreSQL DB) | Zero-cost modern serverless architecture with global CDN caching and managed PostgreSQL |
 
 ## Goal checklist
 
