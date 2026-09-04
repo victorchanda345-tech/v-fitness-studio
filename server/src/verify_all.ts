@@ -14,7 +14,7 @@ async function runMasterVerification() {
   const aliceRes = await fetch(`${baseUrl}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 'alice@studio.com', password: 'password123' }),
+    body: JSON.stringify({ email: 'victor@vfitness.com', password: 'password123' }),
   });
   const { token: aliceToken, user: aliceUser } = await aliceRes.json();
   console.log(`[PASS] Goal 1: Staff authenticated as ${aliceUser.name} (${aliceUser.role})`);
@@ -22,7 +22,7 @@ async function runMasterVerification() {
   const daveRes = await fetch(`${baseUrl}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: 'dave@studio.com', password: 'password123' }),
+    body: JSON.stringify({ email: 'ananya@vfitness.com', password: 'password123' }),
   });
   const { token: daveToken, user: daveUser } = await daveRes.json();
   console.log(`[PASS] Goal 1: Instructor authenticated as ${daveUser.name} (${daveUser.role})`);
@@ -76,7 +76,7 @@ async function runMasterVerification() {
     },
     body: JSON.stringify({ instructorId: daveUser.id }),
   });
-  console.log(`[PASS] Goal 5: Added Dave as co-instructor to Session #${targetSession.id} (Status ${addCoRes.status})`);
+  console.log(`[PASS] Goal 5: Added Ananya as co-instructor to Session #${targetSession.id} (Status ${addCoRes.status})`);
 
   // Verify instructor unified view
   const daveScheduleRes = await fetch(`${baseUrl}/sessions`, {

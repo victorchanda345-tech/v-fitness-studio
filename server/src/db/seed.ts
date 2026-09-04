@@ -58,9 +58,6 @@ async function seed() {
     instrAarav, 
     instrAnanya, 
     instrRohan,
-    staffAliasAlice,
-    instrAliasCarla,
-    instrAliasDave
   ] = await db
     .insert(users)
     .values([
@@ -72,15 +69,10 @@ async function seed() {
       { email: 'aarav@vfitness.com', passwordHash, name: 'Aarav Mehta', role: 'instructor' },
       { email: 'ananya@vfitness.com', passwordHash, name: 'Ananya Iyer', role: 'instructor' },
       { email: 'rohan@vfitness.com', passwordHash, name: 'Rohan Verma', role: 'instructor' },
-
-      // Legacy compatibility logins (also mapped to Victor & instructors)
-      { email: 'alice@studio.com', passwordHash, name: 'Victor Sharma', role: 'staff' },
-      { email: 'carla@studio.com', passwordHash, name: 'Aarav Mehta', role: 'instructor' },
-      { email: 'dave@studio.com', passwordHash, name: 'Ananya Iyer', role: 'instructor' },
     ])
     .returning();
 
-  console.log('  ✓ 8 users created (Staff & Instructors)');
+  console.log('  ✓ 5 users created (Staff & Instructors)');
 
   // ── 2. Classes ───────────────────────────────────────────────────────────────
   const [yoga, pilates, dance, hiit, spin] = await db
@@ -260,7 +252,6 @@ async function seed() {
   console.log('  Instructor: aarav@vfitness.com  (Aarav Mehta)   / password123');
   console.log('  Instructor: ananya@vfitness.com (Ananya Iyer)   / password123');
   console.log('  Instructor: rohan@vfitness.com  (Rohan Verma)   / password123');
-  console.log('  Legacy:     alice@studio.com (Victor Sharma)    / password123');
 
   await client.end();
   process.exit(0);

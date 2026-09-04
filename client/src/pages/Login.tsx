@@ -99,7 +99,7 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="victor@vfitness.com"
+              placeholder="name@vfitness.com"
               required
               autoComplete="email"
             />
