@@ -253,7 +253,7 @@ router.put(
 
     const { date, startTime, duration, capacity, room, primaryInstructorId } = req.body;
 
-    if (primaryInstructorId) {
+    if (primaryInstructorId !== undefined) {
       const instructor = await db.query.users.findFirst({
         where: eq(users.id, Number(primaryInstructorId)),
       });
@@ -261,6 +261,16 @@ router.put(
       if (instructor.role !== 'instructor') {
         return errorResponse(res, 400, 'Selected user is not an instructor');
       }
+
+      // If the new primary instructor was previously assigned as a co-instructor on this session, remove that record
+      await db
+        .delete(sessionCoInstructors)
+        .where(
+          and(
+            eq(sessionCoInstructors.sessionId, id),
+            eq(sessionCoInstructors.instructorId, Number(primaryInstructorId)),
+          ),
+        );
     }
 
     const [updated] = await db

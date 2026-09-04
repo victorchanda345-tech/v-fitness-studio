@@ -19,6 +19,7 @@ export const Sessions: React.FC<SessionsProps> = ({ onNavigateToSession }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dateFilter, setDateFilter] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'primary' | 'co'>('all');
 
   const loadSessions = async () => {
     try {
@@ -36,9 +37,17 @@ export const Sessions: React.FC<SessionsProps> = ({ onNavigateToSession }) => {
     loadSessions();
   }, []);
 
-  const filteredSessions = dateFilter
-    ? sessions.filter((s) => s.date === dateFilter)
-    : sessions;
+  const primaryCount = sessions.filter((s) => s.primaryInstructorId === user?.id).length;
+  const coCount = sessions.filter((s) => s.coInstructors?.some((ci) => ci.id === user?.id)).length;
+
+  const filteredSessions = sessions.filter((s) => {
+    if (dateFilter && s.date !== dateFilter) return false;
+    if (!isStaff) {
+      if (roleFilter === 'primary' && s.primaryInstructorId !== user?.id) return false;
+      if (roleFilter === 'co' && !s.coInstructors?.some((ci) => ci.id === user?.id)) return false;
+    }
+    return true;
+  });
 
   return (
     <div className="animate-fade-in" style={{ padding: '2rem 0', maxWidth: '1280px', margin: '0 auto' }}>
@@ -58,26 +67,57 @@ export const Sessions: React.FC<SessionsProps> = ({ onNavigateToSession }) => {
           <p style={{ color: 'var(--text-secondary)' }}>
             {isStaff 
               ? 'View all scheduled sessions across instructors and rooms' 
-              : 'Sessions where you are assigned as the primary instructor or co-instructor'}
+              : 'Unified list of sessions where you are assigned as the primary instructor or co-instructor'}
           </p>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <label htmlFor="filterDate" style={{ margin: 0, textTransform: 'none', color: 'var(--text-secondary)' }}>
-            Filter by date:
-          </label>
-          <input
-            id="filterDate"
-            type="date"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            style={{ width: 'auto' }}
-          />
-          {dateFilter && (
-            <button onClick={() => setDateFilter('')} className="btn btn-secondary btn-sm">
-              Clear
-            </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          {!isStaff && (
+            <div style={{ display: 'inline-flex', background: 'rgba(15, 23, 42, 0.6)', padding: '0.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+              <button
+                type="button"
+                onClick={() => setRoleFilter('all')}
+                className={`btn btn-sm ${roleFilter === 'all' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ padding: '0.3rem 0.75rem', fontSize: '0.8rem' }}
+              >
+                All Assigned ({sessions.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setRoleFilter('primary')}
+                className={`btn btn-sm ${roleFilter === 'primary' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ padding: '0.3rem 0.75rem', fontSize: '0.8rem' }}
+              >
+                Primary ({primaryCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setRoleFilter('co')}
+                className={`btn btn-sm ${roleFilter === 'co' ? 'btn-primary' : 'btn-ghost'}`}
+                style={{ padding: '0.3rem 0.75rem', fontSize: '0.8rem' }}
+              >
+                Co-Instructor ({coCount})
+              </button>
+            </div>
           )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <label htmlFor="filterDate" style={{ margin: 0, textTransform: 'none', color: 'var(--text-secondary)' }}>
+              Date:
+            </label>
+            <input
+              id="filterDate"
+              type="date"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+              style={{ width: 'auto' }}
+            />
+            {dateFilter && (
+              <button onClick={() => setDateFilter('')} className="btn btn-secondary btn-sm">
+                Clear
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
