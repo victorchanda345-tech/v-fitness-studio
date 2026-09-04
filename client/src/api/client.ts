@@ -91,7 +91,7 @@ export interface BookingsQueryParams {
   classId?: number;
   sessionId?: number;
   status?: string;
-  sortBy?: 'createdAt' | 'status' | 'session';
+  sortBy?: 'createdAt' | 'status' | 'session' | 'name';
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;

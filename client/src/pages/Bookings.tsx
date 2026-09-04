@@ -4,6 +4,7 @@ import {
   api, 
   BookingItem, 
   ClassItem, 
+  SessionItem,
   BookingHistoryItem 
 } from '../api/client';
 import { Modal } from '../components/Modal';
@@ -19,7 +20,9 @@ import {
   ChevronRight, 
   AlertCircle,
   Eye,
-  Plus
+  Plus,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 
 interface BookingsProps {
@@ -30,6 +33,7 @@ export const Bookings: React.FC<BookingsProps> = ({ onNavigateToSession }) => {
   const { isStaff } = useAuth();
   const [bookings, setBookings] = useState<BookingItem[]>([]);
   const [classesList, setClassesList] = useState<ClassItem[]>([]);
+  const [sessionsList, setSessionsList] = useState<SessionItem[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -37,11 +41,12 @@ export const Bookings: React.FC<BookingsProps> = ({ onNavigateToSession }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Filters
+  // Filters (Goal 6: filters for class, session, and status)
   const [search, setSearch] = useState('');
   const [selectedClassId, setSelectedClassId] = useState<string>('all');
+  const [selectedSessionId, setSelectedSessionId] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'createdAt' | 'status' | 'session'>('createdAt');
+  const [sortBy, setSortBy] = useState<'createdAt' | 'status' | 'session' | 'name'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   // History timeline modal
@@ -52,20 +57,29 @@ export const Bookings: React.FC<BookingsProps> = ({ onNavigateToSession }) => {
   const [noteSubmitting, setNoteSubmitting] = useState(false);
   const [noteSuccess, setNoteSuccess] = useState(false);
 
-  // Load classes for filter dropdown
+  // Load classes and sessions for filter dropdowns
   useEffect(() => {
-    async function loadClasses() {
+    async function loadFilterData() {
       try {
-        const cls = await api.getClasses(true);
+        const [cls, sess] = await Promise.all([
+          api.getClasses(true),
+          api.getSessions(),
+        ]);
         setClassesList(cls);
+        setSessionsList(sess);
       } catch (err) {
-        console.error('Failed to load classes for filter', err);
+        console.error('Failed to load filter options', err);
       }
     }
-    loadClasses();
+    loadFilterData();
   }, []);
 
-  // Fetch bookings whenever filters change
+  // Filter available sessions based on selected class
+  const availableSessionsForFilter = selectedClassId !== 'all'
+    ? sessionsList.filter((s) => s.classId === Number(selectedClassId))
+    : sessionsList;
+
+  // Fetch bookings whenever filters change (server-side query)
   const fetchBookings = async () => {
     try {
       setLoading(true);
@@ -73,6 +87,7 @@ export const Bookings: React.FC<BookingsProps> = ({ onNavigateToSession }) => {
       const res = await api.findBookings({
         search: search.trim() || undefined,
         classId: selectedClassId !== 'all' ? Number(selectedClassId) : undefined,
+        sessionId: selectedSessionId !== 'all' ? Number(selectedSessionId) : undefined,
         status: selectedStatus !== 'all' ? selectedStatus : undefined,
         sortBy,
         sortOrder,
@@ -91,11 +106,27 @@ export const Bookings: React.FC<BookingsProps> = ({ onNavigateToSession }) => {
 
   useEffect(() => {
     fetchBookings();
-  }, [search, selectedClassId, selectedStatus, sortBy, sortOrder, page]);
+  }, [search, selectedClassId, selectedSessionId, selectedStatus, sortBy, sortOrder, page]);
 
   // Reset to page 1 when search or filters change
   const handleFilterChange = (setter: (val: any) => void, val: any) => {
     setter(val);
+    setPage(1);
+  };
+
+  const handleClassChange = (classId: string) => {
+    setSelectedClassId(classId);
+    setSelectedSessionId('all');
+    setPage(1);
+  };
+
+  const handleSortClick = (field: 'createdAt' | 'status' | 'session' | 'name') => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder(field === 'createdAt' ? 'desc' : 'asc');
+    }
     setPage(1);
   };
 
@@ -209,12 +240,32 @@ export const Bookings: React.FC<BookingsProps> = ({ onNavigateToSession }) => {
           </label>
           <select
             value={selectedClassId}
-            onChange={(e) => handleFilterChange(setSelectedClassId, e.target.value)}
+            onChange={(e) => handleClassChange(e.target.value)}
           >
             <option value="all">All Classes</option>
             {classesList.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.title} ({c.discipline})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Session Filter (Goal 6: filters for class, session and status) */}
+        <div>
+          <label style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.35rem', display: 'block' }}>
+            Session
+          </label>
+          <select
+            value={selectedSessionId}
+            onChange={(e) => handleFilterChange(setSelectedSessionId, e.target.value)}
+          >
+            <option value="all">
+              {selectedClassId !== 'all' ? 'All Sessions for Class' : 'All Sessions'}
+            </option>
+            {availableSessionsForFilter.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.date} @ {s.startTime} — {s.class?.title || `Class #${s.classId}`} ({s.room})
               </option>
             ))}
           </select>
@@ -252,6 +303,7 @@ export const Bookings: React.FC<BookingsProps> = ({ onNavigateToSession }) => {
               <option value="createdAt">Booked Time</option>
               <option value="status">Status</option>
               <option value="session">Session Date</option>
+              <option value="name">Member Name</option>
             </select>
             <button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
@@ -270,11 +322,47 @@ export const Bookings: React.FC<BookingsProps> = ({ onNavigateToSession }) => {
         <table>
           <thead>
             <tr>
-              <th>Member</th>
+              <th 
+                onClick={() => handleSortClick('name')} 
+                style={{ cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by Member Name"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                  Member
+                  {sortBy === 'name' && (sortOrder === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />)}
+                </div>
+              </th>
               <th>Class & Room</th>
-              <th>Session Time</th>
-              <th>Status</th>
-              <th>Booked Date</th>
+              <th 
+                onClick={() => handleSortClick('session')} 
+                style={{ cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by Session Time"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                  Session Time
+                  {sortBy === 'session' && (sortOrder === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />)}
+                </div>
+              </th>
+              <th 
+                onClick={() => handleSortClick('status')} 
+                style={{ cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by Status"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                  Status
+                  {sortBy === 'status' && (sortOrder === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />)}
+                </div>
+              </th>
+              <th 
+                onClick={() => handleSortClick('createdAt')} 
+                style={{ cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by Booked Date"
+              >
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                  Booked Date
+                  {sortBy === 'createdAt' && (sortOrder === 'asc' ? <ArrowUp size={13} /> : <ArrowDown size={13} />)}
+                </div>
+              </th>
               <th style={{ textAlign: 'right' }}>Actions</th>
             </tr>
           </thead>

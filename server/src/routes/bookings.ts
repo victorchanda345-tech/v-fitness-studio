@@ -98,7 +98,10 @@ router.get(
         sortOrder === 'asc'
           ? [asc(sessions.date), asc(sessions.startTime)]
           : [desc(sessions.date), desc(sessions.startTime)];
+    } else if (sortBy === 'name' || sortBy === 'memberName') {
+      orderClause = [sortOrder === 'asc' ? asc(members.name) : desc(members.name)];
     } else {
+      // Default: booked time (createdAt / bookedTime)
       orderClause = [sortOrder === 'asc' ? asc(bookings.createdAt) : desc(bookings.createdAt)];
     }
 
