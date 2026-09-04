@@ -46,7 +46,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     loadData();
   }, []);
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const formatYMD = (d: Date) => {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const todayStr = formatYMD(new Date());
   const todaySessions = sessions.filter((s) => s.date === todayStr);
 
   // Maximum attendance in 8 weeks for scaling chart bars
