@@ -19,10 +19,9 @@ router.use(authenticate);
 
 // ── Helper: has the session's scheduled time passed? ───────────────────────────
 
-function hasSessionPassed(sessionDate: string, startTime: string, durationMinutes: number): boolean {
+function hasSessionPassed(sessionDate: string, startTime: string): boolean {
   const sessionStart = new Date(`${sessionDate}T${startTime}:00`);
-  const sessionEnd = new Date(sessionStart.getTime() + durationMinutes * 60_000);
-  return new Date() > sessionEnd;
+  return new Date() >= sessionStart;
 }
 
 // ── GET /api/bookings (Goal 6: Finding Bookings) ────────────────────────────────
@@ -220,12 +219,15 @@ router.post(
       );
     }
 
-    // 5. Count current booked bookings to decide status
+    // 5. Count current occupied spots (booked, attended, or no_show) to decide status
     const [{ value: bookedCount }] = await db
       .select({ value: count() })
       .from(bookings)
       .where(
-        and(eq(bookings.sessionId, sessionId), eq(bookings.status, 'booked')),
+        and(
+          eq(bookings.sessionId, sessionId),
+          inArray(bookings.status, ['booked', 'attended', 'no_show']),
+        ),
       );
 
     const status = Number(bookedCount) < session.capacity ? 'booked' : 'waitlisted';
@@ -270,6 +272,22 @@ router.patch(
       where: eq(bookings.id, id),
     });
     if (!booking) return errorResponse(res, 404, 'Booking not found');
+
+    if (booking.status === 'cancelled') {
+      return errorResponse(
+        res,
+        400,
+        'This booking has already been cancelled.',
+      );
+    }
+
+    if (booking.status === 'attended' || booking.status === 'no_show') {
+      return errorResponse(
+        res,
+        400,
+        `Cannot cancel a booking that has already been settled as "${booking.status}".`,
+      );
+    }
 
     if (booking.status !== 'booked' && booking.status !== 'waitlisted') {
       return errorResponse(
@@ -371,6 +389,30 @@ router.patch(
       }
     }
 
+    if (booking.status === 'attended' || booking.status === 'no_show') {
+      return errorResponse(
+        res,
+        400,
+        `Cannot settle booking: this booking has already been settled as "${booking.status}". Settled bookings cannot be modified.`,
+      );
+    }
+
+    if (booking.status === 'cancelled') {
+      return errorResponse(
+        res,
+        400,
+        'Cannot settle a cancelled booking.',
+      );
+    }
+
+    if (booking.status === 'waitlisted') {
+      return errorResponse(
+        res,
+        400,
+        'Cannot settle a waitlisted booking. Only confirmed booked bookings can be settled as attended or no_show.',
+      );
+    }
+
     if (booking.status !== 'booked') {
       return errorResponse(
         res,
@@ -379,12 +421,12 @@ router.patch(
       );
     }
 
-    // Check that the session has passed
-    if (!hasSessionPassed(booking.session.date, booking.session.startTime, booking.session.duration)) {
+    // Check that the session scheduled time has arrived/passed
+    if (!hasSessionPassed(booking.session.date, booking.session.startTime)) {
       return errorResponse(
         res,
         400,
-        'Cannot settle this booking yet — the session has not finished.',
+        `Cannot settle this booking yet — the session's scheduled time (${booking.session.date} at ${booking.session.startTime}) has not arrived.`,
       );
     }
 

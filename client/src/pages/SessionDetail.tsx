@@ -102,7 +102,14 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
     loadData();
   }, [sessionId]);
 
-  // Check if session has ended
+  // Check if session scheduled time has arrived or passed (Goal 4)
+  const isScheduledTimePassed = (): boolean => {
+    if (!session) return false;
+    const sessionStart = new Date(`${session.date}T${session.startTime}:00`);
+    return new Date() >= sessionStart;
+  };
+
+  // Check if session has completely finished
   const isSessionEnded = (): boolean => {
     if (!session) return false;
     const sessionStart = new Date(`${session.date}T${session.startTime}:00`);
@@ -299,7 +306,8 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
 
   const bookedCount = bookings.filter((b) => b.status === 'booked').length;
   const waitlistedCount = bookings.filter((b) => b.status === 'waitlisted').length;
-  const sessionPassed = isSessionEnded();
+  const isScheduledPassed = isScheduledTimePassed();
+  const sessionEnded = isSessionEnded();
 
   // Filter available instructors for adding as co-instructor
   const availableCoInstructors = instructors.filter(
@@ -320,10 +328,12 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
               <span className="badge badge-booked">{session.class?.discipline}</span>
-              {sessionPassed ? (
-                <span className="badge badge-attended">Session Finished</span>
+              {sessionEnded ? (
+                <span className="badge badge-attended">Session Completed</span>
+              ) : isScheduledPassed ? (
+                <span className="badge badge-booked">In Progress</span>
               ) : (
-                <span className="badge badge-waitlisted">Upcoming / In Progress</span>
+                <span className="badge badge-waitlisted">Upcoming</span>
               )}
             </div>
             <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
@@ -510,22 +520,22 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
                 </td>
                 <td style={{ textAlign: 'right' }}>
                   <div style={{ display: 'inline-flex', gap: '0.4rem' }}>
-                    {/* Settle buttons (Allowed for staff and assigned instructors after session finished) */}
+                    {/* Settle buttons (Allowed for staff and assigned instructors after session scheduled time has passed) */}
                     {canSettle && b.status === 'booked' && (
                       <>
                         <button
                           onClick={() => handleSettle(b, 'attended')}
-                          disabled={!sessionPassed}
+                          disabled={!isScheduledPassed}
                           className="btn btn-success btn-sm"
-                          title={sessionPassed ? 'Mark Attended' : 'Cannot settle until session finishes'}
+                          title={isScheduledPassed ? 'Mark Attended' : `Cannot settle until session scheduled time (${session.startTime})`}
                         >
                           <CheckCircle2 size={13} /> Attended
                         </button>
                         <button
                           onClick={() => handleSettle(b, 'no_show')}
-                          disabled={!sessionPassed}
+                          disabled={!isScheduledPassed}
                           className="btn btn-danger btn-sm"
-                          title={sessionPassed ? 'Mark No-Show' : 'Cannot settle until session finishes'}
+                          title={isScheduledPassed ? 'Mark No-Show' : `Cannot settle until session scheduled time (${session.startTime})`}
                         >
                           <XCircle size={13} /> No Show
                         </button>
