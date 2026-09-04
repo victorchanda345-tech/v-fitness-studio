@@ -133,48 +133,6 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
           </button>
         </form>
 
-        {/* 1-Click Demo Logins for Reviewers */}
-        <div style={{
-          marginTop: '1.5rem',
-          padding: '1rem',
-          borderRadius: 'var(--radius-md)',
-          background: 'rgba(255, 255, 255, 0.03)',
-          border: '1px solid var(--border-subtle)',
-        }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.65rem', textAlign: 'center' }}>
-            Quick Demo Login (1-Click Fill)
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-            <button
-              type="button"
-              onClick={() => { setEmail('victor@vfitness.com'); setPassword('password123'); }}
-              className="btn btn-secondary btn-sm"
-              style={{ width: '100%', justifyContent: 'space-between', fontSize: '0.8rem', padding: '0.45rem 0.75rem' }}
-            >
-              <span><strong>Victor Sharma</strong> (Studio Manager)</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>victor@vfitness.com</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => { setEmail('priya@vfitness.com'); setPassword('password123'); }}
-              className="btn btn-secondary btn-sm"
-              style={{ width: '100%', justifyContent: 'space-between', fontSize: '0.8rem', padding: '0.45rem 0.75rem' }}
-            >
-              <span><strong>Priya Patel</strong> (Staff Manager)</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>priya@vfitness.com</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => { setEmail('aarav@vfitness.com'); setPassword('password123'); }}
-              className="btn btn-secondary btn-sm"
-              style={{ width: '100%', justifyContent: 'space-between', fontSize: '0.8rem', padding: '0.45rem 0.75rem' }}
-            >
-              <span><strong>Aarav Mehta</strong> (Instructor)</span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>aarav@vfitness.com</span>
-            </button>
-          </div>
-        </div>
-
         {onViewSchedule && (
           <div style={{
             marginTop: '1.25rem',
