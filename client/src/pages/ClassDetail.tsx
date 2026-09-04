@@ -117,10 +117,31 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
     loadData();
   }, [classId]);
 
+  const openCreateSession = () => {
+    setEditingSession(null);
+    setSessionForm({
+      date: todayStr,
+      startTime: '09:00',
+      duration: cls ? cls.defaultDuration : 60,
+      capacity: cls ? cls.defaultCapacity : 12,
+      room: 'Studio A',
+      primaryInstructorId: instructors.length > 0 ? instructors[0].id : 0,
+    });
+    setIsCreateOpen(true);
+  };
+
   const handleCreateSession = async (e: React.FormEvent) => {
     e.preventDefault();
+    const instId = sessionForm.primaryInstructorId || (instructors.length > 0 ? instructors[0].id : 0);
+    if (!instId) {
+      setError('Please select a valid primary instructor.');
+      return;
+    }
     try {
-      await api.createSession(classId, sessionForm);
+      await api.createSession(classId, {
+        ...sessionForm,
+        primaryInstructorId: instId,
+      });
       setIsCreateOpen(false);
       loadData();
     } catch (err: any) {
@@ -243,7 +264,12 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
         gap: '1rem',
         marginBottom: '1.25rem',
       }}>
-        <h2>Scheduled Sessions ({sessions.length})</h2>
+        <div>
+          <h2 style={{ marginBottom: '0.2rem' }}>Scheduled Sessions ({sessions.length})</h2>
+          <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', margin: 0 }}>
+            Sessions default to {cls.defaultDuration} mins and {cls.defaultCapacity} spots, editable per session.
+          </p>
+        </div>
         {isStaff && (
           <div style={{ display: 'flex', gap: '0.75rem' }}>
             <button 
@@ -253,7 +279,7 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
             >
               <Repeat size={14} /> Recurring Generator
             </button>
-            <button onClick={() => setIsCreateOpen(true)} className="btn btn-primary btn-sm">
+            <button onClick={openCreateSession} className="btn btn-primary btn-sm">
               <Plus size={16} /> Schedule Session
             </button>
           </div>
@@ -282,7 +308,11 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
                     <Clock size={12} /> {s.startTime}
                   </div>
                 </td>
-                <td>{s.duration} mins</td>
+                <td>
+                  <span className="badge" style={{ background: 'rgba(56, 189, 248, 0.1)', color: '#38bdf8', borderColor: 'rgba(56, 189, 248, 0.25)' }}>
+                    {s.duration} mins
+                  </span>
+                </td>
                 <td>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
                     <MapPin size={13} color="var(--accent-amber)" />
@@ -290,9 +320,17 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
                   </div>
                 </td>
                 <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                    <Users size={13} color="var(--accent-purple)" />
-                    {s.primaryInstructor?.name || `Instructor #${s.primaryInstructorId}`}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <Users size={13} color="var(--accent-purple)" />
+                      <strong>{s.primaryInstructor?.name || `Instructor #${s.primaryInstructorId}`}</strong>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>(Primary)</span>
+                    </div>
+                    {s.coInstructors && s.coInstructors.length > 0 && (
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', paddingLeft: '1.15rem' }}>
+                        Co: {s.coInstructors.map((ci) => ci.name).join(', ')}
+                      </div>
+                    )}
                   </div>
                 </td>
                 <td>
@@ -332,8 +370,13 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
             ))}
             {sessions.length === 0 && (
               <tr>
-                <td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3rem' }}>
-                  No sessions scheduled yet. Click "Schedule Session" or "Recurring Generator" above.
+                <td colSpan={6} style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '3.5rem' }}>
+                  <p style={{ marginBottom: '1rem' }}>No sessions scheduled for this class yet.</p>
+                  {isStaff && (
+                    <button onClick={openCreateSession} className="btn btn-primary btn-sm">
+                      <Plus size={15} /> Schedule First Session
+                    </button>
+                  )}
                 </td>
               </tr>
             )}
@@ -351,6 +394,23 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
         title={editingSession ? 'Edit Session' : `Schedule Session — ${cls.title}`}
       >
         <form onSubmit={editingSession ? handleUpdateSession : handleCreateSession} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{
+            padding: '0.75rem 1rem',
+            borderRadius: 'var(--radius-md)',
+            background: 'rgba(59, 130, 246, 0.08)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            fontSize: '0.825rem',
+            color: 'var(--text-secondary)',
+          }}>
+            {editingSession ? (
+              <span>Editing session details for <strong>{cls.title}</strong>. Changes take effect immediately.</span>
+            ) : (
+              <span>
+                Duration ({cls.defaultDuration}m) and capacity ({cls.defaultCapacity} spots) default from <strong>{cls.title}</strong> and can be customized below.
+              </span>
+            )}
+          </div>
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
               <label htmlFor="date">Session Date</label>
@@ -376,7 +436,9 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
             <div>
-              <label htmlFor="duration">Duration (minutes)</label>
+              <label htmlFor="duration">
+                Duration (mins) <span style={{ fontSize: '0.72rem', color: 'var(--accent-cyan)' }}>(Default: {cls.defaultDuration}m)</span>
+              </label>
               <input
                 id="duration"
                 type="number"
@@ -388,7 +450,9 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
               />
             </div>
             <div>
-              <label htmlFor="capacity">Capacity (spots)</label>
+              <label htmlFor="capacity">
+                Capacity (spots) <span style={{ fontSize: '0.72rem', color: 'var(--accent-purple)' }}>(Default: {cls.defaultCapacity})</span>
+              </label>
               <input
                 id="capacity"
                 type="number"
@@ -417,7 +481,8 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
             <label htmlFor="instructor">Primary Instructor</label>
             <select
               id="instructor"
-              value={sessionForm.primaryInstructorId}
+              required
+              value={sessionForm.primaryInstructorId || ''}
               onChange={(e) => setSessionForm({ ...sessionForm, primaryInstructorId: parseInt(e.target.value, 10) })}
             >
               {instructors.map((inst) => (

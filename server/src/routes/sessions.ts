@@ -215,15 +215,25 @@ router.post(
       return errorResponse(res, 400, 'Selected user is not an instructor');
     }
 
+    const sessionDuration =
+      duration !== undefined && duration !== null && String(duration).trim() !== '' && Number(duration) > 0
+        ? Number(duration)
+        : cls.defaultDuration;
+
+    const sessionCapacity =
+      capacity !== undefined && capacity !== null && String(capacity).trim() !== '' && Number(capacity) > 0
+        ? Number(capacity)
+        : cls.defaultCapacity;
+
     const [created] = await db
       .insert(sessions)
       .values({
         classId,
         date,
         startTime,
-        duration: duration ? Number(duration) : cls.defaultDuration,
-        capacity: capacity ? Number(capacity) : cls.defaultCapacity,
-        room,
+        duration: sessionDuration,
+        capacity: sessionCapacity,
+        room: room.trim(),
         primaryInstructorId: Number(primaryInstructorId),
       })
       .returning();
@@ -260,7 +270,7 @@ router.put(
         ...(startTime !== undefined && { startTime }),
         ...(duration !== undefined && { duration: Number(duration) }),
         ...(capacity !== undefined && { capacity: Number(capacity) }),
-        ...(room !== undefined && { room }),
+        ...(room !== undefined && { room: room.trim() }),
         ...(primaryInstructorId !== undefined && {
           primaryInstructorId: Number(primaryInstructorId),
         }),
@@ -282,13 +292,32 @@ router.delete(
     const id = getIdParam(req.params.id);
     if (isNaN(id)) return errorResponse(res, 400, 'Invalid session ID');
 
+    const session = await db.query.sessions.findFirst({
+      where: eq(sessions.id, id),
+    });
+    if (!session) return errorResponse(res, 404, 'Session not found');
+
+    // Clean up dependent bookings and booking history defensively
+    const sessionBookings = await db
+      .select({ id: bookings.id })
+      .from(bookings)
+      .where(eq(bookings.sessionId, id));
+
+    if (sessionBookings.length > 0) {
+      const bookingIds = sessionBookings.map((b) => b.id);
+      await db.delete(bookingHistory).where(inArray(bookingHistory.bookingId, bookingIds));
+      await db.delete(bookings).where(eq(bookings.sessionId, id));
+    }
+
+    // Clean up co-instructors
+    await db.delete(sessionCoInstructors).where(eq(sessionCoInstructors.sessionId, id));
+
     const [deleted] = await db
       .delete(sessions)
       .where(eq(sessions.id, id))
       .returning();
 
-    if (!deleted) return errorResponse(res, 404, 'Session not found');
-    return res.json({ message: 'Session deleted', session: deleted });
+    return res.json({ message: 'Session deleted successfully', session: deleted });
   }),
 );
 

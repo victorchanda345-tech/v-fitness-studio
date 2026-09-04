@@ -23,7 +23,9 @@ import {
   AlertCircle,
   Info,
   Download,
-  UserPlus
+  UserPlus,
+  Edit3,
+  Trash2
 } from 'lucide-react';
 
 interface SessionDetailProps {
@@ -56,6 +58,17 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
   const [historyLoading, setHistoryLoading] = useState(false);
   const [newTimelineNote, setNewTimelineNote] = useState('');
   const [timelineNoteLoading, setTimelineNoteLoading] = useState(false);
+
+  // Edit session modal (Goal 3)
+  const [isEditSessionOpen, setIsEditSessionOpen] = useState(false);
+  const [editSessionForm, setEditSessionForm] = useState({
+    date: '',
+    startTime: '',
+    duration: 60,
+    capacity: 12,
+    room: '',
+    primaryInstructorId: 0,
+  });
 
   const loadData = async () => {
     try {
@@ -227,6 +240,46 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
     }
   };
 
+  // Edit / Delete session handlers (Goal 3)
+  const openEditSession = () => {
+    if (!session) return;
+    setEditSessionForm({
+      date: session.date,
+      startTime: session.startTime,
+      duration: session.duration,
+      capacity: session.capacity,
+      room: session.room,
+      primaryInstructorId: session.primaryInstructorId,
+    });
+    setIsEditSessionOpen(true);
+  };
+
+  const handleUpdateSession = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    try {
+      await api.updateSession(sessionId, editSessionForm);
+      setIsEditSessionOpen(false);
+      setSuccessMsg('Session updated successfully.');
+      loadData();
+    } catch (err: any) {
+      setError(err.message || 'Failed to update session');
+    }
+  };
+
+  const handleDeleteSession = async () => {
+    if (!window.confirm('Are you sure you want to delete this session? All attendee bookings will also be deleted.')) {
+      return;
+    }
+    setError(null);
+    try {
+      await api.deleteSession(sessionId);
+      onBack();
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete session');
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
@@ -343,6 +396,26 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
                 </button>
               )}
             </div>
+
+            {/* Staff Session Controls (Goal 3) */}
+            {isStaff && (
+              <div style={{ marginTop: '1.25rem', display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <button
+                  onClick={openEditSession}
+                  className="btn btn-secondary btn-sm"
+                  title="Edit session details (date, time, duration, capacity, room, instructor)"
+                >
+                  <Edit3 size={14} /> Edit Session
+                </button>
+                <button
+                  onClick={handleDeleteSession}
+                  className="btn btn-danger btn-sm"
+                  title="Delete this session"
+                >
+                  <Trash2 size={14} /> Delete Session
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Capacity Stats Card */}
@@ -691,6 +764,129 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
             </button>
           </div>
         </div>
+      </Modal>
+
+      {/* Edit Session Modal (Goal 3) */}
+      <Modal
+        isOpen={isEditSessionOpen}
+        onClose={() => setIsEditSessionOpen(false)}
+        title={`Edit Session — ${session.class?.title || 'Class'}`}
+      >
+        <form onSubmit={handleUpdateSession} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <div style={{
+            padding: '0.75rem 1rem',
+            borderRadius: 'var(--radius-md)',
+            background: 'rgba(59, 130, 246, 0.08)',
+            border: '1px solid rgba(59, 130, 246, 0.2)',
+            fontSize: '0.825rem',
+            color: 'var(--text-secondary)',
+          }}>
+            Modify any attribute for this session. Duration and capacity can be customized per session.
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <label htmlFor="sDate">Session Date</label>
+              <input
+                id="sDate"
+                type="date"
+                required
+                value={editSessionForm.date}
+                onChange={(e) => setEditSessionForm({ ...editSessionForm, date: e.target.value })}
+              />
+            </div>
+            <div>
+              <label htmlFor="sStartTime">Start Time</label>
+              <input
+                id="sStartTime"
+                type="time"
+                required
+                value={editSessionForm.startTime}
+                onChange={(e) => setEditSessionForm({ ...editSessionForm, startTime: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            <div>
+              <label htmlFor="sDuration">
+                Duration (minutes) {session.class?.defaultDuration ? (
+                  <span style={{ fontSize: '0.72rem', color: 'var(--accent-cyan)' }}>
+                    (Class default: {session.class.defaultDuration}m)
+                  </span>
+                ) : null}
+              </label>
+              <input
+                id="sDuration"
+                type="number"
+                min="10"
+                max="240"
+                required
+                value={editSessionForm.duration}
+                onChange={(e) => setEditSessionForm({ ...editSessionForm, duration: parseInt(e.target.value, 10) || 0 })}
+              />
+            </div>
+            <div>
+              <label htmlFor="sCapacity">
+                Capacity (spots) {session.class?.defaultCapacity ? (
+                  <span style={{ fontSize: '0.72rem', color: 'var(--accent-purple)' }}>
+                    (Class default: {session.class.defaultCapacity})
+                  </span>
+                ) : null}
+              </label>
+              <input
+                id="sCapacity"
+                type="number"
+                min="1"
+                max="100"
+                required
+                value={editSessionForm.capacity}
+                onChange={(e) => setEditSessionForm({ ...editSessionForm, capacity: parseInt(e.target.value, 10) || 0 })}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="sRoom">Room / Studio</label>
+            <input
+              id="sRoom"
+              type="text"
+              required
+              value={editSessionForm.room}
+              onChange={(e) => setEditSessionForm({ ...editSessionForm, room: e.target.value })}
+              placeholder="e.g. Studio A, Studio B"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="sInstructor">Primary Instructor</label>
+            <select
+              id="sInstructor"
+              required
+              value={editSessionForm.primaryInstructorId || ''}
+              onChange={(e) => setEditSessionForm({ ...editSessionForm, primaryInstructorId: parseInt(e.target.value, 10) })}
+            >
+              {instructors.map((inst) => (
+                <option key={inst.id} value={inst.id}>
+                  {inst.name} ({inst.email})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem', marginTop: '1rem' }}>
+            <button
+              type="button"
+              onClick={() => setIsEditSessionOpen(false)}
+              className="btn btn-secondary"
+            >
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary">
+              Save Changes
+            </button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

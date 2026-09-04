@@ -39,7 +39,13 @@ export interface SessionItem {
   room: string;
   primaryInstructorId: number;
   createdAt: string;
-  class?: { id: number; title: string; discipline: string };
+  class?: {
+    id: number;
+    title: string;
+    discipline: string;
+    defaultDuration?: number;
+    defaultCapacity?: number;
+  };
   primaryInstructor?: { id: number; name: string; email: string };
   coInstructors?: CoInstructor[];
   bookings?: BookingItem[];
