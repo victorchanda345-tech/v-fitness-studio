@@ -13,8 +13,7 @@ import {
   Menu, 
   X, 
   Lock, 
-  ChevronRight, 
-  Award 
+  ChevronRight
 } from 'lucide-react';
 
 interface LandingProps {
@@ -207,13 +206,36 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
           {/* Brand */}
           <div 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            style={{ cursor: 'pointer' }}
+            style={{ 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+            }}
           >
-            <div style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-              V Fitness Studio
+            <div style={{
+              width: '38px',
+              height: '38px',
+              borderRadius: '11px',
+              background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 800,
+              fontSize: '1.2rem',
+              color: '#ffffff',
+              boxShadow: '0 4px 14px rgba(37, 99, 235, 0.45)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+            }}>
+              V
             </div>
-            <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-              Boutique Studio & Training
+            <div>
+              <div style={{ fontWeight: 800, fontSize: '1.2rem', letterSpacing: '-0.025em', lineHeight: 1.1 }}>
+                V Fitness Studio
+              </div>
+              <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                Boutique Movement & Fitness
+              </div>
             </div>
           </div>
 
@@ -221,31 +243,41 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
           <nav className="desktop-nav" style={{ display: 'flex', alignItems: 'center', gap: '1.75rem' }}>
             <button 
               onClick={() => scrollToSection('classes')} 
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer', transition: 'color 0.15s ease' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
             >
               Classes
             </button>
             <button 
               onClick={() => scrollToSection('trainers')} 
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer', transition: 'color 0.15s ease' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
             >
               Trainers
             </button>
             <button 
               onClick={() => scrollToSection('studio')} 
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer', transition: 'color 0.15s ease' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
             >
               Studio
             </button>
             <button 
               onClick={() => scrollToSection('memberships')} 
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer', transition: 'color 0.15s ease' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
             >
               Memberships
             </button>
             <button 
               onClick={() => scrollToSection('contact')} 
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', fontSize: '0.875rem', fontWeight: 500, cursor: 'pointer', transition: 'color 0.15s ease' }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ffffff')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
             >
               Location
             </button>
@@ -332,45 +364,64 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
         maxWidth: '1240px',
         margin: '0 auto',
         textAlign: 'center',
+        position: 'relative',
       }}>
+        {/* Ambient Top Glow Orb */}
         <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '0.5rem',
-          padding: '0.35rem 0.85rem',
-          borderRadius: 'var(--radius-full)',
-          background: 'var(--bg-tertiary)',
-          border: '1px solid var(--border-subtle)',
-          fontSize: '0.8rem',
-          color: 'var(--text-secondary)',
-          marginBottom: '1.75rem',
-          fontWeight: 500,
-        }}>
-          <Award size={14} color="var(--accent-primary)" />
-          Premier Boutique Fitness & Movement Studio
-        </div>
+          position: 'absolute',
+          top: '-10%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '600px',
+          height: '350px',
+          background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 75%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }} />
 
-        <h1 style={{
-          fontSize: 'clamp(2.5rem, 5.5vw, 4.2rem)',
-          fontWeight: 800,
-          letterSpacing: '-0.03em',
-          lineHeight: 1.15,
-          marginBottom: '1.5rem',
-          maxWidth: '960px',
-          margin: '0 auto 1.5rem',
-        }}>
-          Transform Your Body, Elevate Your Mind at V Fitness Studio
-        </h1>
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.65rem',
+            padding: '0.4rem 1rem',
+            borderRadius: 'var(--radius-full)',
+            background: 'rgba(255, 255, 255, 0.04)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            fontSize: '0.8rem',
+            color: 'var(--text-secondary)',
+            marginBottom: '2rem',
+            fontWeight: 600,
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+          }}>
+            <span className="pulse-indicator" />
+            <span style={{ color: '#ffffff' }}>LIVE OPERATIONS</span>
+            <span style={{ color: 'var(--text-muted)' }}>•</span>
+            <span>Small-Group Classes Capped at 8–20 Members</span>
+          </div>
 
-        <p style={{
-          fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-          color: 'var(--text-secondary)',
-          maxWidth: '780px',
-          margin: '0 auto 2.5rem',
-          lineHeight: 1.6,
-        }}>
-          Small-group fitness engineered for real progress. Experience expert-led Yoga, Pilates, Bhangra Cardio, and HIIT in state-of-the-art acoustic studios with strictly capped capacities.
-        </p>
+          <h1 className="text-gradient" style={{
+            fontSize: 'clamp(2.5rem, 5.5vw, 4.4rem)',
+            fontWeight: 800,
+            letterSpacing: '-0.035em',
+            lineHeight: 1.12,
+            marginBottom: '1.5rem',
+            maxWidth: '980px',
+            margin: '0 auto 1.5rem',
+          }}>
+            Transform Your Body, Elevate Your Mind at V Fitness Studio
+          </h1>
+
+          <p style={{
+            fontSize: 'clamp(1.05rem, 2vw, 1.25rem)',
+            color: 'var(--text-secondary)',
+            maxWidth: '760px',
+            margin: '0 auto 2.5rem',
+            lineHeight: 1.6,
+          }}>
+            Small-group fitness engineered for real progress. Experience expert-led Yoga, Pilates, Bhangra Cardio, and HIIT in state-of-the-art acoustic studios with strictly capped capacities.
+          </p>
 
         {/* Hero CTAs */}
         <div style={{
@@ -435,10 +486,10 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               100%
             </div>
             <div style={{ fontWeight: 600, fontSize: '0.9rem', marginBottom: '0.25rem' }}>Certified Trainers</div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Master instruction led by Victor Sharma and specialists</div>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* ── Classes Section ───────────────────────────────────────────────── */}
       <section id="classes" style={{

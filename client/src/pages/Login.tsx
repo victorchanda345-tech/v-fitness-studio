@@ -57,13 +57,30 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
           </button>
         )}
 
-        {/* Header without logo */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '0.35rem', letterSpacing: '-0.02em' }}>
+        {/* Header with branded logo mark */}
+        <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontWeight: 800,
+            fontSize: '1.4rem',
+            color: '#ffffff',
+            boxShadow: '0 8px 20px rgba(37, 99, 235, 0.45)',
+            border: '1px solid rgba(255, 255, 255, 0.25)',
+            marginBottom: '0.85rem',
+          }}>
+            V
+          </div>
+          <h1 style={{ fontSize: '1.85rem', fontWeight: 800, marginBottom: '0.35rem', letterSpacing: '-0.025em' }}>
             V Fitness Studio
           </h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-            Sign in to access studio management
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+            Staff & Instructor Management Portal
           </p>
         </div>
 
@@ -82,7 +99,7 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@studio.com"
+              placeholder="victor@vfitness.com"
               required
               autoComplete="email"
             />
@@ -105,20 +122,62 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
             type="submit"
             className="btn btn-primary"
             disabled={loading}
-            style={{ width: '100%', padding: '0.75rem', marginTop: '0.25rem' }}
+            style={{ width: '100%', padding: '0.75rem', marginTop: '0.25rem', fontSize: '0.95rem' }}
           >
             {loading ? 'Signing in...' : (
               <>
-                Sign in
+                Sign in to Dashboard
                 <ArrowRight size={16} />
               </>
             )}
           </button>
         </form>
 
+        {/* 1-Click Demo Logins for Reviewers */}
+        <div style={{
+          marginTop: '1.5rem',
+          padding: '1rem',
+          borderRadius: 'var(--radius-md)',
+          background: 'rgba(255, 255, 255, 0.03)',
+          border: '1px solid var(--border-subtle)',
+        }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.65rem', textAlign: 'center' }}>
+            Quick Demo Login (1-Click Fill)
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+            <button
+              type="button"
+              onClick={() => { setEmail('victor@vfitness.com'); setPassword('password123'); }}
+              className="btn btn-secondary btn-sm"
+              style={{ width: '100%', justifyContent: 'space-between', fontSize: '0.8rem', padding: '0.45rem 0.75rem' }}
+            >
+              <span><strong>Victor Sharma</strong> (Studio Manager)</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>victor@vfitness.com</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setEmail('priya@vfitness.com'); setPassword('password123'); }}
+              className="btn btn-secondary btn-sm"
+              style={{ width: '100%', justifyContent: 'space-between', fontSize: '0.8rem', padding: '0.45rem 0.75rem' }}
+            >
+              <span><strong>Priya Patel</strong> (Staff Manager)</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>priya@vfitness.com</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { setEmail('aarav@vfitness.com'); setPassword('password123'); }}
+              className="btn btn-secondary btn-sm"
+              style={{ width: '100%', justifyContent: 'space-between', fontSize: '0.8rem', padding: '0.45rem 0.75rem' }}
+            >
+              <span><strong>Aarav Mehta</strong> (Instructor)</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>aarav@vfitness.com</span>
+            </button>
+          </div>
+        </div>
+
         {onViewSchedule && (
           <div style={{
-            marginTop: '1.75rem',
+            marginTop: '1.25rem',
             paddingTop: '1.25rem',
             borderTop: '1px solid var(--border-subtle)',
           }}>
