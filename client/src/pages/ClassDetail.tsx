@@ -19,7 +19,8 @@ import {
   AlertCircle,
   Repeat,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Download
 } from 'lucide-react';
 
 interface ClassDetailProps {
@@ -345,6 +346,13 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
                       className="btn btn-primary btn-sm"
                     >
                       Bookings
+                    </button>
+                    <button
+                      onClick={() => api.downloadSessionCsv(s.id)}
+                      className="btn btn-secondary btn-sm"
+                      title="Export attendance as CSV"
+                    >
+                      <Download size={13} /> CSV
                     </button>
                     {isStaff && (
                       <>

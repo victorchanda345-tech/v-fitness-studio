@@ -469,8 +469,10 @@ router.post(
 
     // Generate list of dates matching dayOfWeek between startDate and endDate
     const candidateDates: string[] = [];
-    const current = new Date(`${startDate}T00:00:00`);
-    const end = new Date(`${endDate}T00:00:00`);
+    const [sY, sM, sD] = startDate.split('-').map(Number);
+    const [eY, eM, eD] = endDate.split('-').map(Number);
+    const current = new Date(sY, sM - 1, sD, 12, 0, 0); // midday avoids any timezone/DST shift
+    const end = new Date(eY, eM - 1, eD, 12, 0, 0);
 
     if (current > end) {
       return errorResponse(res, 400, 'startDate must be before or equal to endDate');
@@ -478,7 +480,10 @@ router.post(
 
     while (current <= end) {
       if (current.getDay() === targetDay) {
-        candidateDates.push(current.toISOString().split('T')[0]);
+        const y = current.getFullYear();
+        const m = String(current.getMonth() + 1).padStart(2, '0');
+        const d = String(current.getDate()).padStart(2, '0');
+        candidateDates.push(`${y}-${m}-${d}`);
       }
       current.setDate(current.getDate() + 1);
     }
