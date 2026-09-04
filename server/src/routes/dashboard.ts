@@ -19,23 +19,26 @@ router.get(
   '/stats',
   asyncHandler(async (req, res) => {
     const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+    const formatYMD = (d: Date): string => {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    };
 
-    // Start of today (UTC or local)
-    const todayStart = new Date(today);
-    todayStart.setHours(0, 0, 0, 0);
+    const todayStr = formatYMD(today);
+
+    // Start of today
+    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
 
     // Monday of current week
     const currentDay = today.getDay(); // 0 is Sunday, 1 is Monday
     const distanceToMonday = (currentDay + 6) % 7;
-    const weekStart = new Date(today);
-    weekStart.setDate(today.getDate() - distanceToMonday);
-    weekStart.setHours(0, 0, 0, 0);
-    const weekStartStr = weekStart.toISOString().split('T')[0];
+    const weekStart = new Date(today.getFullYear(), today.getMonth(), today.getDate() - distanceToMonday, 0, 0, 0);
+    const weekEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() - distanceToMonday + 6, 23, 59, 59);
 
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    const weekEndStr = weekEnd.toISOString().split('T')[0];
+    const weekStartStr = formatYMD(weekStart);
+    const weekEndStr = formatYMD(weekEnd);
 
     // Instructor filter if applicable
     let instructorSessionIds: number[] | null = null;
@@ -217,13 +220,11 @@ router.get(
 
     const eightWeeksData = await Promise.all(
       weekIndices.map(async (i) => {
-        const wStart = new Date(weekStart);
-        wStart.setDate(weekStart.getDate() - i * 7);
-        const wEnd = new Date(wStart);
-        wEnd.setDate(wStart.getDate() + 6);
+        const wStart = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() - i * 7, 0, 0, 0);
+        const wEnd = new Date(wStart.getFullYear(), wStart.getMonth(), wStart.getDate() + 6, 23, 59, 59);
 
-        const wStartStr = wStart.toISOString().split('T')[0];
-        const wEndStr = wEnd.toISOString().split('T')[0];
+        const wStartStr = formatYMD(wStart);
+        const wEndStr = formatYMD(wEnd);
 
         const weekCond = [
           gte(sessions.date, wStartStr),
