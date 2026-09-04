@@ -484,7 +484,7 @@ router.post(
 
     const user = await db.query.users.findFirst({
       where: eq(users.id, req.user!.userId),
-      columns: { id: true, name: true, role: true },
+      columns: { id: true, name: true, email: true, role: true },
     });
 
     return res.status(201).json({
@@ -496,6 +496,7 @@ router.post(
 
 // ── GET /api/bookings/:id/history ──────────────────────────────────────────────
 // Returns the immutable timeline for a booking.
+// Staff can view any booking's timeline; instructors can view history for sessions they teach.
 
 router.get(
   '/bookings/:id/history',
@@ -503,16 +504,58 @@ router.get(
     const id = getIdParam(req.params.id);
     if (isNaN(id)) return errorResponse(res, 400, 'Invalid booking ID');
 
+    if (req.user!.role === 'instructor') {
+      const booking = await db.query.bookings.findFirst({
+        where: eq(bookings.id, id),
+        with: {
+          session: {
+            with: { coInstructors: true },
+          },
+        },
+      });
+      if (!booking) return errorResponse(res, 404, 'Booking not found');
+      const isPrimary = booking.session.primaryInstructorId === req.user!.userId;
+      const isCo = booking.session.coInstructors.some((ci) => ci.instructorId === req.user!.userId);
+      if (!isPrimary && !isCo) {
+        return errorResponse(res, 403, 'You can only view history for bookings on sessions you teach');
+      }
+    }
+
     const history = await db.query.bookingHistory.findMany({
       where: eq(bookingHistory.bookingId, id),
       with: {
-        changedByUser: { columns: { id: true, name: true, role: true } },
+        changedByUser: { columns: { id: true, name: true, email: true, role: true } },
       },
       orderBy: (h, { asc }) => [asc(h.createdAt)],
     });
 
     return res.json(history);
   }),
+);
+
+// ── Goal 9: History you cannot rewrite ──────────────────────────────────────────
+// Nothing in this timeline can be edited or deleted after the fact, including by studio staff.
+// Explicitly reject all HTTP methods that attempt to modify or delete timeline audit records.
+
+router.all(
+  [
+    '/bookings/:id/history',
+    '/bookings/:id/history/:historyId',
+    '/bookings/:id/notes',
+    '/bookings/:id/notes/:noteId',
+    '/booking-history',
+    '/booking-history/:id',
+  ],
+  (req, res, next) => {
+    if (req.method === 'DELETE' || req.method === 'PUT' || req.method === 'PATCH') {
+      return errorResponse(
+        res,
+        403,
+        'History you cannot rewrite: timeline entries cannot be edited or deleted after the fact, including by studio staff.',
+      );
+    }
+    next();
+  },
 );
 
 // ── GET /api/sessions/:sessionId/bookings ──────────────────────────────────────

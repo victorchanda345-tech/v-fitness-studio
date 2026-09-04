@@ -713,7 +713,11 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
                     <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>
-                      {log.oldStatus ? `${log.oldStatus} -> ${log.newStatus}` : `Created as ${log.newStatus}`}
+                      {log.oldStatus
+                        ? log.oldStatus === log.newStatus
+                          ? `Staff Note (${log.newStatus})`
+                          : `${log.oldStatus} -> ${log.newStatus}`
+                        : `Created as ${log.newStatus}`}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                       {new Date(log.createdAt).toLocaleString()}
@@ -725,7 +729,7 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
                     </div>
                   )}
                   <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                    Actor: {log.changedByUser?.name || 'System / Auto'} ({log.changedByUser?.role || 'engine'})
+                    Actor: {log.changedByUser?.name || 'System / Auto'} {log.changedByUser?.email ? `(${log.changedByUser.email})` : log.changedByUser?.role ? `(${log.changedByUser.role})` : ''}
                   </div>
                 </div>
               ))}

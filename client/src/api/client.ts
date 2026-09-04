@@ -83,7 +83,7 @@ export interface BookingHistoryItem {
   changedBy: number | null;
   note: string | null;
   createdAt: string;
-  changedByUser?: { id: number; name: string; role: string } | null;
+  changedByUser?: { id: number; name: string; role: string; email?: string } | null;
 }
 
 export interface BookingsQueryParams {
