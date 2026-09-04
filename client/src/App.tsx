@@ -27,6 +27,17 @@ const MainApp: React.FC = () => {
   const [alertsCount, setAlertsCount] = useState<number>(0);
   const [publicView, setPublicView] = useState<PublicView>('landing');
 
+  // Pre-warm public timetable in background and wake up server
+  useEffect(() => {
+    api.getPublicSchedule()
+      .then((data) => {
+        try {
+          localStorage.setItem('vfitness_public_schedule', JSON.stringify(data));
+        } catch {}
+      })
+      .catch(() => {});
+  }, []);
+
   // Load active alerts count for staff
   useEffect(() => {
     if (user && isStaff) {

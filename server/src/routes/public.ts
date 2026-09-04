@@ -6,23 +6,49 @@ import { asyncHandler } from '../utils/errors.js';
 
 const router = Router();
 
+interface CacheEntry {
+  data: any;
+  cachedAt: number;
+}
+
+const scheduleCache = new Map<string, CacheEntry>();
+const CACHE_TTL_MS = 60 * 1000; // 60 seconds TTL
+
+function formatYMD(d: Date): string {
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 // ── GET /api/public/schedule ──────────────────────────────────────────────────
-// Unauthenticated public timetable for prospective and current members
+// Unauthenticated public timetable for prospective and current members.
+// Cached in-memory and on Edge CDN for high performance.
 
 router.get(
   '/schedule',
   asyncHandler(async (req, res) => {
     const today = new Date();
-    const todayStr = today.toISOString().split('T')[0];
+    const todayStr = formatYMD(today);
 
     // Default to a 14-day window if no dates specified
     const in14Days = new Date(today);
     in14Days.setDate(today.getDate() + 14);
-    const in14DaysStr = in14Days.toISOString().split('T')[0];
+    const in14DaysStr = formatYMD(in14Days);
 
     const startDate = (req.query.startDate as string) || todayStr;
     const endDate = (req.query.endDate as string) || in14DaysStr;
     const disciplineFilter = req.query.discipline as string | undefined;
+
+    const cacheKey = `${startDate}:${endDate}:${disciplineFilter || 'all'}`;
+    const cached = scheduleCache.get(cacheKey);
+
+    // Serve from in-memory cache if fresh
+    if (cached && Date.now() - cached.cachedAt < CACHE_TTL_MS) {
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=120, stale-while-revalidate=300');
+      res.setHeader('X-Cache', 'HIT');
+      return res.json(cached.data);
+    }
 
     // Fetch sessions in range with class, primary instructor, and co-instructors
     const sessionList = await db.query.sessions.findMany({
@@ -76,13 +102,20 @@ router.get(
     // Collect available disciplines for quick filter buttons
     const disciplines = Array.from(new Set(publicSessions.map((s) => s.discipline))).sort();
 
-    return res.json({
+    const responsePayload = {
       startDate,
       endDate,
       total: publicSessions.length,
       disciplines,
       sessions: publicSessions,
-    });
+    };
+
+    // Store in cache
+    scheduleCache.set(cacheKey, { data: responsePayload, cachedAt: Date.now() });
+
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=120, stale-while-revalidate=300');
+    res.setHeader('X-Cache', 'MISS');
+    return res.json(responsePayload);
   }),
 );
 
