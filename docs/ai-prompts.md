@@ -104,7 +104,7 @@ This document logs the primary AI prompts used during development, grouped by go
 
 ### What was produced
 - Studio rebrand to **V Fitness Studio**.
-- Database re-seeded with authentic Indian names, with studio manager named **Victor Sharma** (`victor@vfitness.com`).
+- Database re-seeded with authentic Indian names, with studio manager named **Victor Chanda** (`victor@vfitness.com`).
 - Currency formatted to Indian Rupees (`₹`) across all payroll metrics and CSV exports.
 - Dynamic responsive mobile drawer with hamburger toggle button (`Menu` / `X`) under `@media (max-width: 980px)`.
 - Backend endpoints `POST /api/auth/instructors` and `DELETE /api/auth/instructors/:id` and frontend management view `Instructors.tsx` allowing studio staff to register and safely remove instructors.
@@ -120,7 +120,7 @@ This document logs the primary AI prompts used during development, grouped by go
 - High-aesthetic public Landing page (`Landing.tsx`) with dark-slate theme, zero emoticons/emojis, and Lucide icons.
 - Hero section highlighting studio metrics (15+ weekly sessions, 3 studio rooms, strict capacity caps, 100% certified trainers).
 - Filterable class offerings showcase with durations, typical rooms, intensity levels, and detailed descriptions for Morning Flow Yoga, Core Pilates, Bhangra Cardio & Dance, HIIT Blast, and Spin & Sweat.
-- Master trainer spotlights for Victor Sharma, Aarav Mehta, Ananya Iyer, and Rohan Verma.
+- Master trainer spotlights for Victor Chanda, Aarav Mehta, Ananya Iyer, and Rohan Verma.
 - Studio amenities breakdown (sprung flooring, acoustic engineering, guaranteed spot control).
 - Transparent membership pricing tiers (Drop-In ₹600, 10-Class Pack ₹5,000, Unlimited Monthly ₹8,500).
 - Seamless 3-way navigation in `App.tsx` between the Landing page, the live public timetable, and the staff/instructor login portal.

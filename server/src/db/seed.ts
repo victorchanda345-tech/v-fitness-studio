@@ -62,7 +62,7 @@ async function seed() {
     .insert(users)
     .values([
       // Primary Manager Victor & Staff Priya
-      { email: 'victor@vfitness.com', passwordHash, name: 'Victor Sharma', role: 'staff' },
+      { email: 'victor@vfitness.com', passwordHash, name: 'Victor Chanda', role: 'staff' },
       { email: 'priya@vfitness.com', passwordHash, name: 'Priya Patel', role: 'staff' },
       
       // Fitness Instructors
@@ -247,7 +247,7 @@ async function seed() {
   // ── Done ─────────────────────────────────────────────────────────────────────
   console.log('\n✅ Seed complete!\n');
   console.log('V Fitness Studio Credentials:');
-  console.log('  Manager:    victor@vfitness.com (Victor Sharma) / password123');
+  console.log('  Manager:    victor@vfitness.com (Victor Chanda) / password123');
   console.log('  Manager:    priya@vfitness.com  (Priya Patel)   / password123');
   console.log('  Instructor: aarav@vfitness.com  (Aarav Mehta)   / password123');
   console.log('  Instructor: ananya@vfitness.com (Ananya Iyer)   / password123');

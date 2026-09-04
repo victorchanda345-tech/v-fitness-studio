@@ -22,7 +22,7 @@ Fill this in and commit it. This is the first file we open.
 
 | Role | Name | Email | Password |
 |------|------|-------|----------|
-| **Studio Manager** | **Victor Sharma** | `victor@vfitness.com` | `password123` |
+| **Studio Manager** | **Victor Chanda** | `victor@vfitness.com` | `password123` |
 | **Staff Manager** | **Priya Patel** | `priya@vfitness.com` | `password123` |
 | **Instructor** | **Aarav Mehta** | `aarav@vfitness.com` | `password123` |
 | **Instructor** | **Ananya Iyer** | `ananya@vfitness.com` | `password123` |

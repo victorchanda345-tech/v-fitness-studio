@@ -95,7 +95,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
 
   const trainers = [
     {
-      name: 'Victor Sharma',
+      name: 'Victor Chanda',
       role: 'Head Strength Coach & Studio Manager',
       discipline: 'Strength & Conditioning, Athletic HIIT',
       bio: 'Over 12 years of coaching experience in sports performance and functional movement. Victor leads our curriculum and ensures strict safety standards across all studio workouts.',
@@ -866,7 +866,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                 <div>
                   <div style={{ fontWeight: 600, fontSize: '0.9rem' }}>Direct Inquiries</div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
-                    +91 98765 43210 / contact@vfitness.com
+                    +91 9064074801 / victorchanda1101@gmail.com
                   </div>
                 </div>
               </div>
