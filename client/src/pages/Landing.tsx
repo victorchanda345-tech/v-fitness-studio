@@ -307,7 +307,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
       experience: '500-hr RYT certified, international retreat instructor'
     },
     {
-      name: 'Rahul Verma',
+      name: 'Rohan Verma',
       role: 'Pilates Specialist',
       specialty: 'Classical Mat Pilates, Spinal Rehabilitation & Posture',
       experience: 'PMA Certified, biomechanics consultant'

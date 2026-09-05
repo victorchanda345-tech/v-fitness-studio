@@ -67,7 +67,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       capacity: 10,
       room: 'Studio C',
       primaryInstructor: 'Victor Chanda',
-      coInstructors: ['Rahul Verma'],
+      coInstructors: ['Rohan Verma'],
       spotsRemaining: 2,
       isFull: false,
       waitlistedCount: 0,
@@ -82,7 +82,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       duration: 50,
       capacity: 12,
       room: 'Studio B',
-      primaryInstructor: 'Rahul Verma',
+      primaryInstructor: 'Rohan Verma',
       coInstructors: ['Ananya Iyer'],
       spotsRemaining: 1,
       isFull: false,
@@ -147,7 +147,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       capacity: 10,
       room: 'Studio C',
       primaryInstructor: 'Victor Chanda',
-      coInstructors: ['Rahul Verma'],
+      coInstructors: ['Rohan Verma'],
       spotsRemaining: 3,
       isFull: false,
       waitlistedCount: 0,
@@ -178,7 +178,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       duration: 50,
       capacity: 12,
       room: 'Studio B',
-      primaryInstructor: 'Rahul Verma',
+      primaryInstructor: 'Rohan Verma',
       coInstructors: [],
       spotsRemaining: 4,
       isFull: false,
@@ -237,12 +237,12 @@ export const matchesInstructorName = (sessionInstructor: string, filterInstructo
   if (sLower === fLower) return true;
   if (sLower.includes(fLower) || fLower.includes(sLower)) return true;
 
-  // First name match (e.g. Victor, Priya, Ananya, Rahul/Rohan, Aarav)
+  // First name match (e.g. Victor, Priya, Ananya, Rohan, Aarav)
   const fFirst = fLower.split(' ')[0];
   const sFirst = sLower.split(' ')[0];
   if (fFirst && sFirst && fFirst === sFirst) return true;
 
-  // Cross-system name aliases (e.g. Ananya Iyer, Rahul Verma / Rohan Verma)
+  // Cross-system name aliases (e.g. Ananya Iyer, Rohan Verma)
   if (fLower.includes('ananya') && sLower.includes('ananya')) return true;
   if (fLower.includes('verma') && sLower.includes('verma')) return true;
   if (fLower.includes('victor') && sLower.includes('victor')) return true;
@@ -296,7 +296,7 @@ export const COACH_OPTIONS = [
   { id: 'all', label: 'All Coaches' },
   { id: 'Victor Chanda', label: 'Victor Chanda • Head Coach' },
   { id: 'Ananya Iyer', label: 'Ananya Iyer • Movement Coach' },
-  { id: 'Rahul Verma', label: 'Rahul Verma • Pilates Specialist' },
+  { id: 'Rohan Verma', label: 'Rohan Verma • Pilates Specialist' },
   { id: 'Priya Patel', label: 'Priya Patel • Cardio & Dance Lead' },
   { id: 'Aarav Mehta', label: 'Aarav Mehta • Mobility Coach' },
 ];
