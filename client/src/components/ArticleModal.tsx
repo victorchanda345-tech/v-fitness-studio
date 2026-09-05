@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Clock, Calendar, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export interface ArticleSection {
@@ -52,19 +53,25 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose, on
     };
   }, [onClose]);
 
-  return (
+  return createPortal(
     <div 
       style={{
         position: 'fixed',
-        inset: 0,
-        zIndex: 1100,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 99999,
         backgroundColor: 'rgba(5, 6, 8, 0.88)',
         backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '1.25rem',
-        animation: 'fadeIn 0.2s ease-out'
+        padding: '1rem',
+        boxSizing: 'border-box',
       }}
       onClick={onClose}
     >
@@ -470,6 +477,7 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose, on
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

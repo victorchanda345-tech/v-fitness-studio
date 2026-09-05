@@ -471,7 +471,7 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
   const sortedDates = Object.keys(groupedByDate).sort();
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem 1.5rem' }}>
       {/* Top Brand Bar */}
       <header style={{
         display: 'flex',
@@ -615,7 +615,7 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
             {COACH_OPTIONS.map((co) => {
               const isActive = co.id === 'all' 
                 ? selectedInstructor === 'all' 
-                : matchesInstructorName(co.id, selectedInstructor);
+                : (selectedInstructor !== 'all' && matchesInstructorName(co.id, selectedInstructor));
               return (
                 <button
                   key={co.id}

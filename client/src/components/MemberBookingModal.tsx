@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   Calendar, 
@@ -179,34 +180,60 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
     }
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') onClose();
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = 'unset';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
+
   const isFull = session.spotsRemaining === 0;
 
-  return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 1100,
-      backgroundColor: 'rgba(5, 6, 9, 0.86)',
-      backdropFilter: 'blur(14px)',
-      WebkitBackdropFilter: 'blur(14px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '1.25rem',
-      animation: 'fadeIn 0.2s ease-out',
-    }}>
+  return createPortal(
+    <div 
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        zIndex: 99999,
+        backgroundColor: 'rgba(5, 6, 9, 0.88)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '1rem',
+        boxSizing: 'border-box',
+      }}
+    >
       <div 
+        onClick={(e) => e.stopPropagation()}
         style={{
           width: '100%',
           maxWidth: '560px',
           backgroundColor: '#0D0E13',
           border: '1px solid rgba(229, 36, 36, 0.35)',
           borderRadius: '12px',
-          boxShadow: '0 25px 65px rgba(0, 0, 0, 0.9), 0 0 35px rgba(229, 36, 36, 0.15)',
+          boxShadow: '0 25px 65px rgba(0, 0, 0, 0.95), 0 0 35px rgba(229, 36, 36, 0.15)',
           overflow: 'hidden',
           display: 'flex',
           flexDirection: 'column',
-          maxHeight: '92vh',
+          maxHeight: '90vh',
+          boxSizing: 'border-box',
         }}
       >
         {/* Header */}
@@ -654,6 +681,7 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
 
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
