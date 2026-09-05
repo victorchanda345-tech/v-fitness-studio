@@ -1449,19 +1449,6 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
         <ArticleModal
           article={selectedArticle}
           onClose={() => setSelectedArticle(null)}
-          onBookClass={() => {
-            const articleId = selectedArticle.id;
-            setSelectedArticle(null);
-            if (articleId === 'strength-principles' || articleId === 'biomechanics-lifting') {
-              onOpenTimetable('Studio C', 'Victor Chanda');
-            } else if (articleId === 'relentless-consistency') {
-              onOpenTimetable('Studio B', 'Aarav Mehta');
-            } else if (articleId === 'nutrition-timing') {
-              onOpenTimetable('Studio A', 'Priya Patel');
-            } else {
-              onOpenTimetable();
-            }
-          }}
         />
       )}
 

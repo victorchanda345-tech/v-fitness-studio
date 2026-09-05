@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Clock, Calendar, CheckCircle2, ArrowRight } from 'lucide-react';
+import { X, Clock, Calendar, CheckCircle2 } from 'lucide-react';
 
 export interface ArticleSection {
   heading?: string;
@@ -25,16 +25,16 @@ export interface EditorialArticle {
   sections: ArticleSection[];
   keyTakeaways: string[];
   relatedClassTitle: string;
-  relatedClassCta: string;
+  relatedClassCta?: string;
 }
 
 interface ArticleModalProps {
   article: EditorialArticle;
   onClose: () => void;
-  onBookClass: () => void;
+  onBookClass?: () => void;
 }
 
-export const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose, onBookClass }) => {
+export const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) => {
   // Lock body scroll while modal is active
   useEffect(() => {
     const originalOverflow = document.body.style.overflow;
@@ -432,47 +432,34 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose, on
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+          <div>
             <button
               onClick={onClose}
               style={{
-                background: 'transparent',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
+                background: 'rgba(255, 255, 255, 0.08)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
                 borderRadius: '5px',
-                color: 'rgba(255, 255, 255, 0.75)',
-                fontSize: '0.8rem',
+                color: '#ffffff',
+                fontSize: '0.82rem',
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em',
-                padding: '0.65rem 1.15rem',
+                padding: '0.65rem 1.5rem',
                 cursor: 'pointer',
                 transition: 'all 0.2s ease'
               }}
               onMouseOver={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.35)';
+                e.currentTarget.style.backgroundColor = 'var(--crimson-primary)';
+                e.currentTarget.style.borderColor = 'var(--crimson-primary)';
                 e.currentTarget.style.color = '#ffffff';
               }}
               onMouseOut={(e) => {
-                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-                e.currentTarget.style.color = 'rgba(255, 255, 255, 0.75)';
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                e.currentTarget.style.color = '#ffffff';
               }}
             >
               CLOSE
-            </button>
-
-            <button
-              onClick={onBookClass}
-              className="btn-athletic-primary"
-              style={{
-                fontSize: '0.8rem',
-                padding: '0.65rem 1.35rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.5rem'
-              }}
-            >
-              {article.relatedClassCta}
-              <ArrowRight size={14} />
             </button>
           </div>
         </div>
