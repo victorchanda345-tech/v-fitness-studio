@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 :root {
   --bg-primary: #080c14;
   --bg-secondary: #0e1422;
@@ -6,6 +8,12 @@
   --bg-card-hover: rgba(25, 35, 56, 0.85);
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-focus: rgba(59, 130, 246, 0.6);
+
+  --crimson-primary: #E52424;
+  --crimson-hover: #FF3232;
+  --crimson-dark: #991B1B;
+  --crimson-glow: rgba(229, 36, 36, 0.35);
+  --font-display: 'Bebas Neue', 'Inter', -apple-system, sans-serif;
   
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
@@ -506,3 +514,267 @@ tr:hover td {
     border-top: 1px solid var(--border-subtle);
   }
 }
+
+/* ── Athletic High-End Aesthetic (Marcus Reid / High-Contrast Crimson) ──── */
+.font-display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.hero-banner {
+  background-color: #07080B;
+  background-image: 
+    radial-gradient(circle at 72% 40%, rgba(229, 36, 36, 0.42) 0%, rgba(180, 20, 20, 0.15) 32%, transparent 68%),
+    radial-gradient(circle at 20% 85%, rgba(229, 36, 36, 0.08) 0%, transparent 45%);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.hero-watermark {
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: clamp(4.5rem, 15vw, 15rem);
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.035);
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  pointer-events: none;
+  z-index: 1;
+  top: 10%;
+  left: 3%;
+  white-space: nowrap;
+  line-height: 0.85;
+  user-select: none;
+}
+
+.eyebrow-red {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--crimson-primary);
+  margin-bottom: 0.9rem;
+}
+
+.eyebrow-square {
+  width: 6px;
+  height: 6px;
+  background-color: var(--crimson-primary);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.btn-crimson {
+  background-color: var(--crimson-primary);
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 0.85rem 1.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(229, 36, 36, 0.4);
+  text-decoration: none;
+}
+
+.btn-crimson:hover {
+  background-color: var(--crimson-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(229, 36, 36, 0.6);
+  color: #ffffff !important;
+}
+
+.btn-athletic-outline {
+  background: transparent;
+  color: #ffffff !important;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.875rem;
+  padding: 0.85rem 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn-athletic-outline:hover {
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff !important;
+}
+
+.stat-glass-card {
+  background: rgba(14, 12, 14, 0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(229, 36, 36, 0.35);
+  border-radius: 10px;
+  padding: 1.25rem 1.4rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 24px rgba(229, 36, 36, 0.15);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.stat-glass-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--crimson-primary);
+}
+
+.program-card {
+  background: #0D0E12;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+}
+
+.program-card:hover {
+  border-color: rgba(229, 36, 36, 0.5);
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(229, 36, 36, 0.2);
+}
+
+.program-card-featured {
+  border-color: var(--crimson-primary) !important;
+  box-shadow: 0 12px 32px rgba(229, 36, 36, 0.25);
+}
+
+.program-card-featured:hover {
+  box-shadow: 0 20px 48px rgba(229, 36, 36, 0.45) !important;
+}
+
+.program-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 11;
+  overflow: hidden;
+  background-color: #050608;
+}
+
+.program-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s ease;
+  display: block;
+}
+
+.program-card:hover .program-img {
+  transform: scale(1.06);
+}
+
+.program-number-chip {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: rgba(7, 8, 11, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--crimson-primary);
+  border: 1px solid rgba(229, 36, 36, 0.35);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  line-height: 1.1;
+}
+
+.program-duration-chip {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(7, 8, 11, 0.88);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+}
+
+.photo-card {
+  background: #0D0E12;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(229, 36, 36, 0.4);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+}
+
+.photo-card-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #000;
+}
+
+.photo-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+  display: block;
+}
+
+.photo-card:hover .photo-card-img {
+  transform: scale(1.05);
+}
+
+.photo-card-badge {
+  background: var(--crimson-primary);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 3px;
+  display: inline-block;
+  margin-bottom: 0.75rem;
+}
+
+.photo-card-title {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  color: #ffffff;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
