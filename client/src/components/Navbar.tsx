@@ -23,7 +23,7 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, alertsCount = 0 }) => {
-  const { user, logout, isStaff } = useAuth();
+  const { user, logout, isStaff, isMember } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavClick = (tab: string) => {
@@ -51,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, alertsC
       }}>
         {/* Brand */}
         <div 
-          onClick={() => handleNavClick('dashboard')}
+          onClick={() => handleNavClick(isMember ? 'sessions' : 'dashboard')}
           style={{ 
             cursor: 'pointer',
             userSelect: 'none',
@@ -81,127 +81,147 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, alertsC
               V Fitness Studio
             </div>
             <div style={{ fontSize: '0.675rem', color: 'var(--text-muted)', letterSpacing: '0.05em', textTransform: 'uppercase', fontWeight: 600 }}>
-              Studio Operations
+              {isMember ? 'Member Portal' : 'Studio Operations'}
             </div>
           </div>
         </div>
 
         {/* Desktop Navigation Tabs */}
-        <nav className="desktop-nav nav-pill-group">
-          <button
-            onClick={() => handleNavClick('dashboard')}
-            className={`nav-pill-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-          >
-            <LayoutDashboard size={15} />
-            Dashboard
-          </button>
-
-          <button
-            onClick={() => handleNavClick('classes')}
-            className={`nav-pill-item ${activeTab === 'classes' ? 'active' : ''}`}
-          >
-            <Layers size={15} />
-            Classes
-          </button>
-
-          <button
-            onClick={() => handleNavClick('sessions')}
-            className={`nav-pill-item ${activeTab === 'sessions' ? 'active' : ''}`}
-          >
-            <Calendar size={15} />
-            {isStaff ? 'All Sessions' : 'My Sessions'}
-          </button>
-
-          <button
-            onClick={() => handleNavClick('bookings')}
-            className={`nav-pill-item ${activeTab === 'bookings' ? 'active' : ''}`}
-          >
-            <CalendarCheck size={15} />
-            Bookings
-          </button>
-
-          {isStaff && (
-            <>
-              <button
-                onClick={() => handleNavClick('members')}
-                className={`nav-pill-item ${activeTab === 'members' ? 'active' : ''}`}
-              >
-                <Users size={15} />
-                Members
-              </button>
-
-              <button
-                onClick={() => handleNavClick('instructors')}
-                className={`nav-pill-item ${activeTab === 'instructors' ? 'active' : ''}`}
-                title="Manage Instructors"
-              >
-                <UserPlus size={15} />
-                Instructors
-              </button>
-            </>
-          )}
-
-          {/* Alerts Tab with live badge */}
-          {isStaff && (
+        {isMember ? (
+          <nav className="desktop-nav nav-pill-group">
             <button
-              onClick={() => handleNavClick('alerts')}
-              className={`nav-pill-item ${activeTab === 'alerts' ? 'active' : ''}`}
-              style={{ position: 'relative' }}
+              onClick={() => handleNavClick('sessions')}
+              className={`nav-pill-item ${activeTab === 'sessions' ? 'active' : ''}`}
             >
-              <Bell size={15} />
-              Alerts
-              {alertsCount > 0 && (
-                <span 
-                  style={{ 
-                    background: '#ef4444',
-                    color: '#ffffff',
-                    borderRadius: '999px', 
-                    padding: '0.1rem 0.45rem', 
-                    fontSize: '0.675rem',
-                    marginLeft: '0.2rem',
-                    fontWeight: 700,
-                    boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)',
-                  }}
-                >
-                  {alertsCount}
-                </span>
-              )}
+              <Calendar size={15} />
+              Upcoming Sessions
             </button>
-          )}
 
-          {/* Reports: Payroll & Rooms (Staff only) */}
-          {isStaff && (
-            <>
+            <button
+              onClick={() => handleNavClick('bookings')}
+              className={`nav-pill-item ${activeTab === 'bookings' ? 'active' : ''}`}
+            >
+              <CalendarCheck size={15} />
+              My Bookings
+            </button>
+          </nav>
+        ) : (
+          <nav className="desktop-nav nav-pill-group">
+            <button
+              onClick={() => handleNavClick('dashboard')}
+              className={`nav-pill-item ${activeTab === 'dashboard' ? 'active' : ''}`}
+            >
+              <LayoutDashboard size={15} />
+              Dashboard
+            </button>
+
+            <button
+              onClick={() => handleNavClick('classes')}
+              className={`nav-pill-item ${activeTab === 'classes' ? 'active' : ''}`}
+            >
+              <Layers size={15} />
+              Classes
+            </button>
+
+            <button
+              onClick={() => handleNavClick('sessions')}
+              className={`nav-pill-item ${activeTab === 'sessions' ? 'active' : ''}`}
+            >
+              <Calendar size={15} />
+              {isStaff ? 'All Sessions' : 'My Sessions'}
+            </button>
+
+            <button
+              onClick={() => handleNavClick('bookings')}
+              className={`nav-pill-item ${activeTab === 'bookings' ? 'active' : ''}`}
+            >
+              <CalendarCheck size={15} />
+              Bookings
+            </button>
+
+            {isStaff && (
+              <>
+                <button
+                  onClick={() => handleNavClick('members')}
+                  className={`nav-pill-item ${activeTab === 'members' ? 'active' : ''}`}
+                >
+                  <Users size={15} />
+                  Members
+                </button>
+
+                <button
+                  onClick={() => handleNavClick('instructors')}
+                  className={`nav-pill-item ${activeTab === 'instructors' ? 'active' : ''}`}
+                  title="Manage Instructors"
+                >
+                  <UserPlus size={15} />
+                  Instructors
+                </button>
+              </>
+            )}
+
+            {/* Alerts Tab with live badge */}
+            {isStaff && (
               <button
-                onClick={() => handleNavClick('payroll')}
-                className={`nav-pill-item ${activeTab === 'payroll' ? 'active' : ''}`}
-                title="Instructor Payroll Reporting"
+                onClick={() => handleNavClick('alerts')}
+                className={`nav-pill-item ${activeTab === 'alerts' ? 'active' : ''}`}
+                style={{ position: 'relative' }}
               >
-                <Receipt size={15} />
-                Payroll
+                <Bell size={15} />
+                Alerts
+                {alertsCount > 0 && (
+                  <span 
+                    style={{ 
+                      background: '#ef4444',
+                      color: '#ffffff',
+                      borderRadius: '999px', 
+                      padding: '0.1rem 0.45rem', 
+                      fontSize: '0.675rem',
+                      marginLeft: '0.2rem',
+                      fontWeight: 700,
+                      boxShadow: '0 0 8px rgba(239, 68, 68, 0.6)',
+                    }}
+                  >
+                    {alertsCount}
+                  </span>
+                )}
               </button>
+            )}
 
-              <button
-                onClick={() => handleNavClick('rooms')}
-                className={`nav-pill-item ${activeTab === 'rooms' ? 'active' : ''}`}
-                title="Room Utilization Reporting"
-              >
-                <Building2 size={15} />
-                Rooms
-              </button>
-            </>
-          )}
+            {/* Reports: Payroll & Rooms (Staff only) */}
+            {isStaff && (
+              <>
+                <button
+                  onClick={() => handleNavClick('payroll')}
+                  className={`nav-pill-item ${activeTab === 'payroll' ? 'active' : ''}`}
+                  title="Instructor Payroll Reporting"
+                >
+                  <Receipt size={15} />
+                  Payroll
+                </button>
 
-          {/* Public Timetable Link */}
-          <button
-            onClick={() => handleNavClick('public-schedule')}
-            className={`nav-pill-item ${activeTab === 'public-schedule' ? 'active' : ''}`}
-            title="Public Class Schedule"
-          >
-            <Globe size={15} />
-            Timetable
-          </button>
-        </nav>
+                <button
+                  onClick={() => handleNavClick('rooms')}
+                  className={`nav-pill-item ${activeTab === 'rooms' ? 'active' : ''}`}
+                  title="Room Utilization Reporting"
+                >
+                  <Building2 size={15} />
+                  Rooms
+                </button>
+              </>
+            )}
+
+            {/* Public Timetable Link */}
+            <button
+              onClick={() => handleNavClick('public-schedule')}
+              className={`nav-pill-item ${activeTab === 'public-schedule' ? 'active' : ''}`}
+              title="Public Class Schedule"
+            >
+              <Globe size={15} />
+              Timetable
+            </button>
+          </nav>
+        )}
 
         {/* Desktop User Info & Sign out */}
         <div className="desktop-user-info" style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
@@ -220,6 +240,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, alertsC
               borderRadius: '50%',
               background: user?.role === 'staff' 
                 ? 'linear-gradient(135deg, #E52424 0%, #991B1B 100%)'
+                : user?.role === 'member'
+                ? 'linear-gradient(135deg, #059669 0%, #047857 100%)'
                 : 'linear-gradient(135deg, #4B5563 0%, #1F2937 100%)',
               color: '#ffffff',
               display: 'flex',
@@ -263,97 +285,119 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, alertsC
       {/* Dynamic Mobile Menu Drawer */}
       {mobileMenuOpen && (
         <div className="mobile-nav-drawer">
-          <button
-            onClick={() => handleNavClick('dashboard')}
-            className={`btn ${activeTab === 'dashboard' ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            <LayoutDashboard size={18} />
-            Dashboard
-          </button>
-
-          <button
-            onClick={() => handleNavClick('classes')}
-            className={`btn ${activeTab === 'classes' ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            <Layers size={18} />
-            Classes
-          </button>
-
-          <button
-            onClick={() => handleNavClick('sessions')}
-            className={`btn ${activeTab === 'sessions' ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            <Calendar size={18} />
-            {isStaff ? 'All Sessions' : 'My Sessions'}
-          </button>
-
-          <button
-            onClick={() => handleNavClick('bookings')}
-            className={`btn ${activeTab === 'bookings' ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            <CalendarCheck size={18} />
-            Bookings
-          </button>
-
-          {isStaff && (
+          {isMember ? (
             <>
               <button
-                onClick={() => handleNavClick('members')}
-                className={`btn ${activeTab === 'members' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => handleNavClick('sessions')}
+                className={`btn ${activeTab === 'sessions' ? 'btn-primary' : 'btn-secondary'}`}
               >
-                <Users size={18} />
-                Members
+                <Calendar size={18} />
+                Upcoming Sessions
               </button>
 
               <button
-                onClick={() => handleNavClick('instructors')}
-                className={`btn ${activeTab === 'instructors' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => handleNavClick('bookings')}
+                className={`btn ${activeTab === 'bookings' ? 'btn-primary' : 'btn-secondary'}`}
               >
-                <UserPlus size={18} />
-                Instructors
+                <CalendarCheck size={18} />
+                My Bookings
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => handleNavClick('dashboard')}
+                className={`btn ${activeTab === 'dashboard' ? 'btn-primary' : 'btn-secondary'}`}
+              >
+                <LayoutDashboard size={18} />
+                Dashboard
               </button>
 
               <button
-                onClick={() => handleNavClick('alerts')}
-                className={`btn ${activeTab === 'alerts' ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ display: 'flex', justifyContent: 'space-between' }}
+                onClick={() => handleNavClick('classes')}
+                className={`btn ${activeTab === 'classes' ? 'btn-primary' : 'btn-secondary'}`}
               >
-                <span style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                  <Bell size={18} />
-                  Alerts
-                </span>
-                {alertsCount > 0 && (
-                  <span className="badge badge-no_show" style={{ borderRadius: '10px' }}>
-                    {alertsCount}
-                  </span>
-                )}
+                <Layers size={18} />
+                Classes
               </button>
 
               <button
-                onClick={() => handleNavClick('payroll')}
-                className={`btn ${activeTab === 'payroll' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => handleNavClick('sessions')}
+                className={`btn ${activeTab === 'sessions' ? 'btn-primary' : 'btn-secondary'}`}
               >
-                <Receipt size={18} />
-                Payroll
+                <Calendar size={18} />
+                {isStaff ? 'All Sessions' : 'My Sessions'}
               </button>
 
               <button
-                onClick={() => handleNavClick('rooms')}
-                className={`btn ${activeTab === 'rooms' ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => handleNavClick('bookings')}
+                className={`btn ${activeTab === 'bookings' ? 'btn-primary' : 'btn-secondary'}`}
               >
-                <Building2 size={18} />
-                Rooms
+                <CalendarCheck size={18} />
+                Bookings
+              </button>
+
+              {isStaff && (
+                <>
+                  <button
+                    onClick={() => handleNavClick('members')}
+                    className={`btn ${activeTab === 'members' ? 'btn-primary' : 'btn-secondary'}`}
+                  >
+                    <Users size={18} />
+                    Members
+                  </button>
+
+                  <button
+                    onClick={() => handleNavClick('instructors')}
+                    className={`btn ${activeTab === 'instructors' ? 'btn-primary' : 'btn-secondary'}`}
+                  >
+                    <UserPlus size={18} />
+                    Instructors
+                  </button>
+
+                  <button
+                    onClick={() => handleNavClick('alerts')}
+                    className={`btn ${activeTab === 'alerts' ? 'btn-primary' : 'btn-secondary'}`}
+                    style={{ display: 'flex', justifyContent: 'space-between' }}
+                  >
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <Bell size={18} />
+                      Alerts
+                    </span>
+                    {alertsCount > 0 && (
+                      <span className="badge badge-no_show" style={{ borderRadius: '10px' }}>
+                        {alertsCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => handleNavClick('payroll')}
+                    className={`btn ${activeTab === 'payroll' ? 'btn-primary' : 'btn-secondary'}`}
+                  >
+                    <Receipt size={18} />
+                    Payroll
+                  </button>
+
+                  <button
+                    onClick={() => handleNavClick('rooms')}
+                    className={`btn ${activeTab === 'rooms' ? 'btn-primary' : 'btn-secondary'}`}
+                  >
+                    <Building2 size={18} />
+                    Rooms
+                  </button>
+                </>
+              )}
+
+              <button
+                onClick={() => handleNavClick('public-schedule')}
+                className={`btn ${activeTab === 'public-schedule' ? 'btn-primary' : 'btn-secondary'}`}
+              >
+                <Globe size={18} />
+                Public Timetable
               </button>
             </>
           )}
-
-          <button
-            onClick={() => handleNavClick('public-schedule')}
-            className={`btn ${activeTab === 'public-schedule' ? 'btn-primary' : 'btn-secondary'}`}
-          >
-            <Globe size={18} />
-            Public Timetable
-          </button>
 
           {/* Mobile User & Logout Footer */}
           <div className="mobile-user-section">

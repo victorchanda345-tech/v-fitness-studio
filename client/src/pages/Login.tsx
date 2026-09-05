@@ -9,6 +9,7 @@ interface LoginProps {
 
 export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) => {
   const { login } = useAuth();
+  const [portalMode, setPortalMode] = useState<'staff' | 'member'>('staff');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -24,6 +25,18 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
       setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSwitchMode = (mode: 'staff' | 'member') => {
+    setPortalMode(mode);
+    setError(null);
+    if (mode === 'member') {
+      setEmail('rahul@example.com');
+      setPassword('password123');
+    } else {
+      setEmail('admin@vfitness.com');
+      setPassword('admin123');
     }
   };
 
@@ -65,7 +78,7 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
       <div 
         style={{
           width: '100%',
-          maxWidth: '460px',
+          maxWidth: '480px',
           padding: '2.5rem 2.25rem',
           backgroundColor: 'rgba(13, 14, 18, 0.88)',
           backdropFilter: 'blur(24px)',
@@ -92,7 +105,7 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
               letterSpacing: '0.06em',
               padding: '0.4rem 0.85rem',
               cursor: 'pointer',
-              marginBottom: '1.75rem',
+              marginBottom: '1.5rem',
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.4rem',
@@ -113,7 +126,7 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
         )}
 
         {/* Studio Branding & Portal Header */}
-        <div style={{ textAlign: 'center', marginBottom: '2.25rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -157,14 +170,69 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
                 textTransform: 'uppercase',
                 marginTop: '0.2rem'
               }}>
-                STAFF &amp; INSTRUCTOR PORTAL
+                {portalMode === 'member' ? 'MEMBER PORTAL' : 'STAFF & INSTRUCTOR PORTAL'}
               </div>
             </div>
           </div>
 
           <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.85rem', marginTop: '0.35rem' }}>
-            Secure operations access for studio staff &amp; instructors
+            {portalMode === 'member' 
+              ? 'Sign in to view upcoming sessions and your private bookings'
+              : 'Secure operations access for studio staff & instructors'}
           </p>
+        </div>
+
+        {/* Portal Mode Switcher (Staff vs Member) */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '0.5rem',
+          backgroundColor: 'rgba(7, 8, 11, 0.7)',
+          padding: '0.35rem',
+          borderRadius: '8px',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          marginBottom: '1.5rem'
+        }}>
+          <button
+            type="button"
+            onClick={() => handleSwitchMode('staff')}
+            style={{
+              padding: '0.6rem 0.5rem',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              transition: 'all 0.2s ease',
+              backgroundColor: portalMode === 'staff' ? 'var(--crimson-primary)' : 'transparent',
+              color: portalMode === 'staff' ? '#ffffff' : 'rgba(255, 255, 255, 0.6)',
+              boxShadow: portalMode === 'staff' ? '0 2px 10px rgba(229, 36, 36, 0.4)' : 'none'
+            }}
+          >
+            Staff &amp; Instructors
+          </button>
+          <button
+            type="button"
+            onClick={() => handleSwitchMode('member')}
+            style={{
+              padding: '0.6rem 0.5rem',
+              borderRadius: '6px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.75rem',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              transition: 'all 0.2s ease',
+              backgroundColor: portalMode === 'member' ? 'var(--crimson-primary)' : 'transparent',
+              color: portalMode === 'member' ? '#ffffff' : 'rgba(255, 255, 255, 0.6)',
+              boxShadow: portalMode === 'member' ? '0 2px 10px rgba(229, 36, 36, 0.4)' : 'none'
+            }}
+          >
+            Member Sign-In
+          </button>
         </div>
 
         {error && (
@@ -177,14 +245,14 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div>
             <label htmlFor="email" style={{ display: 'block', fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'rgba(255, 255, 255, 0.8)', marginBottom: '0.45rem' }}>
-              Staff &amp; Instructor Email Address
+              {portalMode === 'member' ? 'Member Email Address' : 'Staff & Instructor Email Address'}
             </label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@vfitness.com"
+              placeholder={portalMode === 'member' ? 'e.g. rahul@example.com' : 'name@vfitness.com'}
               required
               autoComplete="email"
               style={{
@@ -208,7 +276,7 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder={portalMode === 'member' ? 'Enter password (e.g. password123)' : 'Enter your password'}
               required
               autoComplete="current-password"
               style={{
@@ -231,12 +299,34 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
           >
             {loading ? 'AUTHENTICATING...' : (
               <>
-                SIGN IN TO DASHBOARD
+                {portalMode === 'member' ? 'SIGN IN AS MEMBER' : 'SIGN IN TO DASHBOARD'}
                 <ArrowRight size={16} />
               </>
             )}
           </button>
         </form>
+
+        {/* Evaluator Quick Hint */}
+        <div style={{
+          marginTop: '1.25rem',
+          padding: '0.75rem 0.95rem',
+          backgroundColor: 'rgba(255, 255, 255, 0.03)',
+          border: '1px dashed rgba(255, 255, 255, 0.12)',
+          borderRadius: '6px',
+          fontSize: '0.75rem',
+          color: 'rgba(255, 255, 255, 0.65)',
+          lineHeight: 1.45
+        }}>
+          {portalMode === 'member' ? (
+            <div>
+              <strong style={{ color: '#ffffff' }}>Demo Member Sign-In:</strong> Use email <code style={{ color: 'var(--crimson-primary)' }}>rahul@example.com</code> with password <code style={{ color: 'var(--crimson-primary)' }}>password123</code> to access member schedule.
+            </div>
+          ) : (
+            <div>
+              <strong style={{ color: '#ffffff' }}>Demo Staff Sign-In:</strong> Use <code style={{ color: 'var(--crimson-primary)' }}>admin@vfitness.com</code> with <code style={{ color: 'var(--crimson-primary)' }}>admin123</code> to access full operations dashboard.
+            </div>
+          )}
+        </div>
 
         {onViewSchedule && (
           <div style={{

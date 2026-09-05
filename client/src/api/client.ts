@@ -4,7 +4,8 @@ export interface User {
   id: number;
   email: string;
   name: string;
-  role: 'staff' | 'instructor';
+  role: 'staff' | 'instructor' | 'member';
+  membershipExpiry?: string;
 }
 
 export interface InstructorItem extends User {
@@ -580,6 +581,9 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify({ email }),
     }),
+
+  getMemberUpcomingSessions: (email: string) =>
+    request<MemberUpcomingSessionsResponse>(`/public/members/${encodeURIComponent(email)}/sessions`),
 };
 
 // ── Member Self-Service Types ─────────────────────────────────────────────────
@@ -620,6 +624,34 @@ export interface MemberSelfServiceBooking {
 export interface MemberBookingsResponse {
   member: MemberProfile;
   bookings: MemberSelfServiceBooking[];
+}
+
+export interface MemberUpcomingSession {
+  id: number;
+  classId: number;
+  classTitle: string;
+  title: string;
+  description?: string | null;
+  discipline: string;
+  date: string;
+  time: string;
+  startTime: string;
+  duration: number;
+  capacity: number;
+  room: string;
+  instructorName: string;
+  primaryInstructor?: string | { id?: number; name: string };
+  coInstructors?: string[] | Array<{ id?: number; name: string }>;
+  spotsRemaining: number;
+  isFull: boolean;
+  waitlistedCount?: number;
+  myBookingStatus?: 'booked' | 'waitlisted' | null;
+}
+
+export interface MemberUpcomingSessionsResponse {
+  member: MemberProfile;
+  total: number;
+  sessions: MemberUpcomingSession[];
 }
 
 export interface MemberBookingCreateResponse {

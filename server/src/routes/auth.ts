@@ -3,10 +3,9 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { eq } from 'drizzle-orm';
 import { db } from '../db/index.js';
-import { users } from '../db/schema.js';
+import { users, members, sessionCoInstructors, sessions } from '../db/schema.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
 import { asyncHandler, errorResponse, getIdParam } from '../utils/errors.js';
-import { sessionCoInstructors, sessions } from '../db/schema.js';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret';
@@ -22,34 +21,61 @@ router.post(
       return errorResponse(res, 400, 'Email and password are required');
     }
 
+    const normalizedEmail = String(email).trim().toLowerCase();
+
+    // 1. First check staff and instructors in users table
     const user = await db.query.users.findFirst({
-      where: eq(users.email, email),
+      where: eq(users.email, normalizedEmail),
     });
 
-    if (!user) {
-      return errorResponse(res, 401, 'Invalid email or password');
+    if (user) {
+      const isValid = await bcrypt.compare(password, user.passwordHash);
+      if (!isValid) {
+        return errorResponse(res, 401, 'Invalid email or password');
+      }
+
+      const token = jwt.sign(
+        { userId: user.id, role: user.role },
+        JWT_SECRET,
+        { expiresIn: '24h' },
+      );
+
+      return res.json({
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
+      });
     }
 
-    const isValid = await bcrypt.compare(password, user.passwordHash);
-    if (!isValid) {
-      return errorResponse(res, 401, 'Invalid email or password');
-    }
-
-    const token = jwt.sign(
-      { userId: user.id, role: user.role },
-      JWT_SECRET,
-      { expiresIn: '24h' },
-    );
-
-    return res.json({
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
+    // 2. If not a staff/instructor, check members table
+    const member = await db.query.members.findFirst({
+      where: eq(members.email, normalizedEmail),
     });
+
+    if (member) {
+      const token = jwt.sign(
+        { userId: member.id, memberId: member.id, role: 'member' },
+        JWT_SECRET,
+        { expiresIn: '24h' },
+      );
+
+      return res.json({
+        token,
+        user: {
+          id: member.id,
+          email: member.email,
+          name: member.name,
+          role: 'member',
+          membershipExpiry: member.membershipExpiry,
+        },
+      });
+    }
+
+    return errorResponse(res, 401, 'Invalid email or password');
   }),
 );
 
@@ -59,6 +85,22 @@ router.get(
   '/me',
   authenticate,
   asyncHandler(async (req, res) => {
+    if (req.user!.role === 'member') {
+      const member = await db.query.members.findFirst({
+        where: eq(members.id, req.user!.userId),
+        columns: { id: true, email: true, name: true, membershipExpiry: true },
+      });
+
+      if (!member) {
+        return errorResponse(res, 404, 'Member not found');
+      }
+
+      return res.json({
+        ...member,
+        role: 'member',
+      });
+    }
+
     const user = await db.query.users.findFirst({
       where: eq(users.id, req.user!.userId),
       columns: { id: true, email: true, name: true, role: true },

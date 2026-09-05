@@ -266,6 +266,91 @@ router.get(
   }),
 );
 
+// ── GET /api/public/members/:email/sessions ───────────────────────────────────
+// Member self-service read-only list of upcoming sessions:
+// (class title, date, time, room, instructor name, spots remaining — strictly NO other members' info)
+router.get(
+  '/members/:email/sessions',
+  asyncHandler(async (req, res) => {
+    const email = String(req.params.email || '').trim().toLowerCase();
+    if (!email) return errorResponse(res, 400, 'Email address is required');
+
+    const member = await db.query.members.findFirst({
+      where: eq(members.email, email),
+    });
+
+    if (!member) {
+      return errorResponse(res, 404, 'Member profile not found');
+    }
+
+    const todayStr = formatYMD(new Date());
+
+    const sessionList = await db.query.sessions.findMany({
+      where: gte(sessions.date, todayStr),
+      with: {
+        class: {
+          columns: { id: true, title: true, description: true, discipline: true, isArchived: true },
+        },
+        primaryInstructor: {
+          columns: { id: true, name: true },
+        },
+        coInstructors: {
+          with: {
+            instructor: { columns: { id: true, name: true } },
+          },
+        },
+        bookings: {
+          columns: { status: true, memberId: true },
+        },
+      },
+      orderBy: (s, { asc }) => [asc(s.date), asc(s.startTime)],
+    });
+
+    const sanitizedSessions = sessionList
+      .filter((s) => s.class && !s.class.isArchived)
+      .map((s) => {
+        const bookedCount = s.bookings.filter((b) => b.status === 'booked').length;
+        const waitlistedCount = s.bookings.filter((b) => b.status === 'waitlisted').length;
+        const spotsRemaining = Math.max(0, s.capacity - bookedCount);
+        const myBooking = s.bookings.find((b) => b.memberId === member.id);
+
+        return {
+          id: s.id,
+          classId: s.class.id,
+          classTitle: s.class.title,
+          title: s.class.title,
+          description: s.class.description,
+          discipline: s.class.discipline,
+          date: s.date,
+          time: s.startTime,
+          startTime: s.startTime,
+          duration: s.duration,
+          capacity: s.capacity,
+          room: s.room,
+          instructorName: s.primaryInstructor?.name || 'Studio Instructor',
+          primaryInstructor: s.primaryInstructor?.name || 'Studio Instructor',
+          coInstructors: s.coInstructors.map((ci) => ci.instructor.name),
+          spotsRemaining,
+          isFull: spotsRemaining === 0,
+          waitlistedCount,
+          myBookingStatus: myBooking ? myBooking.status : null,
+          // STRICT PRIVACY GUARANTEE: absolutely no other members' names, emails, or IDs
+        };
+      });
+
+    return res.json({
+      member: {
+        id: member.id,
+        name: member.name,
+        email: member.email,
+        membershipExpiry: member.membershipExpiry,
+      },
+      total: sanitizedSessions.length,
+      sessions: sanitizedSessions,
+    });
+  }),
+);
+
 // ── POST /api/public/bookings ─────────────────────────────────────────────────
 // Member self-service booking creation.
 // Enforces membership expiry rules, duplicate check, capacity, and auto-waitlist.

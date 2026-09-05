@@ -3,9 +3,12 @@ import jwt from 'jsonwebtoken';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
+export type UserRole = 'staff' | 'instructor' | 'member';
+
 export interface AuthUser {
   userId: number;
-  role: 'staff' | 'instructor';
+  role: UserRole;
+  memberId?: number;
 }
 
 // Augment Express Request so req.user is typed everywhere
@@ -50,7 +53,7 @@ export function authenticate(req: Request, res: Response, next: NextFunction): v
  * Gate that rejects requests whose authenticated role is not in `roles`.
  * Must be placed after `authenticate`.
  */
-export function requireRole(...roles: Array<'staff' | 'instructor'>) {
+export function requireRole(...roles: UserRole[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({ error: 'Authentication required' });

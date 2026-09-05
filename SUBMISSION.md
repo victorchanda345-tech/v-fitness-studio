@@ -27,6 +27,9 @@ Fill this in and commit it. This is the first file we open.
 | **Instructor** | **Aarav Mehta** | `aarav@vfitness.com` | `password123` |
 | **Instructor** | **Ananya Iyer** | `ananya@vfitness.com` | `password123` |
 | **Instructor** | **Rohan Verma** | `rohan@vfitness.com` | `password123` |
+| **Member (Active 90d)** | **Rahul Sharma** | `rahul@example.com` | `password123` |
+| **Member (Active 60d)** | **Sneha Rao** | `sneha@example.com` | `password123` |
+| **Member (Expiring 5d)** | **Arjun Nair** | `arjun@example.com` | `password123` |
 
 ## Stack
 
@@ -61,7 +64,8 @@ Mark each honestly. Partial is fine — say what is partial.
 | S1 | Public class schedule page | Done | Unauthenticated public timetable endpoint (`GET /api/public/schedule`) and responsive public interface (`PublicSchedule.tsx`). Displays real-time spot availability, discipline filter chips, date selector, instructor rosters, and direct authentication entry points. |
 | S2 | Instructor payroll based on sessions taught | Done | Instructor payroll reporting engine (`GET /api/reports/payroll`) and management portal (`Payroll.tsx`). Calculates compensation for completed sessions taught across custom date windows. Features configurable base rates (₹50 primary / ₹35 co-instructor), executive KPI cards, itemized session audit drawers, and one-click CSV export. |
 | S3 | Room utilization reporting | Done | Studio room utilization analytics (`GET /api/reports/room-utilization`) and visualization interface (`RoomUtilization.tsx`). Analyzes room occupancy percentages, booked classroom hours against customizable operational windows (e.g., 12 hours/day), member capacity fill rates, and peak usage distributions (Morning, Afternoon, Evening). |
-| S4 | Online self-service booking & waitlist visibility for members | Done | Production-grade member self-service booking engine (`POST /api/public/bookings`, `PATCH /api/public/bookings/:id/cancel`, `GET /api/public/members/:email/bookings`, `POST /api/public/members/verify`). Members can directly reserve class spots online, join waitlists with real-time waitlist position tracking (#1, #2, etc.), track membership expiry validity, view upcoming sessions, and self-cancel with immediate auto-promotion for waiting members. Integrated into both schedule and landing page via `MemberBookingModal.tsx` and `MemberPortalModal.tsx`. |
+| S4 | Online self-service booking & waitlist visibility for members | Done | Production-grade member self-service booking engine (`POST /api/public/bookings`, `PATCH /api/public/bookings/:id/cancel`, `GET /api/public/members/:email/bookings`, `POST /api/public/members/verify`). Members can directly reserve class spots online, join waitlists with real-time waitlist position tracking (#1, #2, etc.), track membership expiry validity, and self-cancel with immediate auto-promotion for waiting members. Integrated into both schedule and landing page via `MemberBookingModal.tsx` and `MemberPortalModal.tsx`. |
+| S5 | Member Login & Read-Only Upcoming Sessions (Strict Privacy) | Done | Members can securely sign in via `/login` (e.g., `rahul@example.com` / `password123`) or via member self-service. Authenticated members access a dedicated, clean read-only schedule view (`MemberScheduleView.tsx` & `MemberPortalModal.tsx`) showing upcoming sessions (`date >= today`) with **Class Title**, **Date**, **Time**, **Room**, **Instructor Name**, and **Spots Remaining**. **Zero other member info is exposed**: members receive HTTP 403 on `/api/members`, `/api/bookings` is strictly scoped to one's own records, and session payloads are sanitized to exclude all other participant data. |
 
 ## How much time did you actually spend?
 

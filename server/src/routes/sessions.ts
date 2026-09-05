@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { eq, and, or, inArray, asc } from 'drizzle-orm';
+import { eq, and, or, inArray, asc, gte } from 'drizzle-orm';
 import { db } from '../db/index.js';
 import { sessions, classes, users, sessionCoInstructors, bookings, bookingHistory } from '../db/schema.js';
 import { authenticate, requireRole } from '../middleware/auth.js';
@@ -29,6 +29,52 @@ router.get(
   asyncHandler(async (req, res) => {
     const classId = getIdParam(req.params.classId);
     if (isNaN(classId)) return errorResponse(res, 400, 'Invalid class ID');
+
+    if (req.user!.role === 'member') {
+      const sessionList = await db.query.sessions.findMany({
+        where: eq(sessions.classId, classId),
+        with: {
+          primaryInstructor: { columns: { id: true, name: true } },
+          coInstructors: {
+            with: {
+              instructor: { columns: { id: true, name: true } },
+            },
+          },
+          class: { columns: { id: true, title: true, discipline: true } },
+          bookings: {
+            columns: { status: true, memberId: true },
+          },
+        },
+        orderBy: (s, { asc }) => [asc(s.date), asc(s.startTime)],
+      });
+
+      const memberSessions = sessionList.map((s) => {
+        const bookedCount = s.bookings.filter((b) => b.status === 'booked').length;
+        const spotsRemaining = Math.max(0, s.capacity - bookedCount);
+        const myBooking = s.bookings.find((b) => b.memberId === req.user!.userId);
+
+        return {
+          id: s.id,
+          classId: s.class.id,
+          classTitle: s.class.title,
+          date: s.date,
+          time: s.startTime,
+          startTime: s.startTime,
+          duration: s.duration,
+          room: s.room,
+          instructorName: s.primaryInstructor?.name || 'Studio Instructor',
+          primaryInstructor: s.primaryInstructor,
+          coInstructors: s.coInstructors.map((ci) => ci.instructor),
+          capacity: s.capacity,
+          spotsRemaining,
+          isFull: spotsRemaining === 0,
+          myBookingStatus: myBooking ? myBooking.status : null,
+          class: s.class,
+        };
+      });
+
+      return res.json(memberSessions);
+    }
 
     let sessionList;
     if (req.user!.role === 'instructor') {
@@ -85,11 +131,76 @@ router.get(
 );
 
 // ── GET /api/sessions ──────────────────────────────────────────────────────────
-// List all sessions (instructors see sessions where primary or co-instructor)
+// List all sessions (instructors see sessions where primary or co-instructor; members see read-only upcoming sessions)
 
 router.get(
   '/sessions',
   asyncHandler(async (req, res) => {
+    // 1. Role: member -> read-only upcoming sessions, strictly no other member info
+    if (req.user!.role === 'member') {
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      const sessionList = await db.query.sessions.findMany({
+        where: gte(sessions.date, todayStr),
+        with: {
+          class: {
+            columns: { id: true, title: true, description: true, discipline: true, isArchived: true },
+          },
+          primaryInstructor: {
+            columns: { id: true, name: true },
+          },
+          coInstructors: {
+            with: {
+              instructor: { columns: { id: true, name: true } },
+            },
+          },
+          bookings: {
+            columns: { status: true, memberId: true },
+          },
+        },
+        orderBy: (s, { asc }) => [asc(s.date), asc(s.startTime)],
+      });
+
+      const memberSessions = sessionList
+        .filter((s) => s.class && !s.class.isArchived)
+        .map((s) => {
+          const bookedCount = s.bookings.filter((b) => b.status === 'booked').length;
+          const waitlistedCount = s.bookings.filter((b) => b.status === 'waitlisted').length;
+          const spotsRemaining = Math.max(0, s.capacity - bookedCount);
+          const myBooking = s.bookings.find((b) => b.memberId === req.user!.userId);
+
+          return {
+            id: s.id,
+            classId: s.class.id,
+            classTitle: s.class.title,
+            title: s.class.title,
+            description: s.class.description,
+            discipline: s.class.discipline,
+            date: s.date,
+            time: s.startTime,
+            startTime: s.startTime,
+            duration: s.duration,
+            room: s.room,
+            instructorName: s.primaryInstructor?.name || 'Studio Instructor',
+            primaryInstructor: { id: s.primaryInstructor?.id, name: s.primaryInstructor?.name || 'Studio Instructor' },
+            coInstructors: s.coInstructors.map((ci) => ({ id: ci.instructor.id, name: ci.instructor.name })),
+            capacity: s.capacity,
+            spotsRemaining,
+            isFull: spotsRemaining === 0,
+            waitlistedCount,
+            myBookingStatus: myBooking ? myBooking.status : null,
+            class: {
+              id: s.class.id,
+              title: s.class.title,
+              discipline: s.class.discipline,
+            },
+            // STRICT PRIVACY: under no circumstances include any other member's info
+          };
+        });
+
+      return res.json(memberSessions);
+    }
+
     let sessionList;
     if (req.user!.role === 'instructor') {
       const coRecords = await db
@@ -170,6 +281,39 @@ router.get(
     if (!session) return errorResponse(res, 404, 'Session not found');
 
     const coInstructorList = session.coInstructors.map((ci) => ci.instructor);
+
+    // If requester is a member: strictly protect other members' privacy!
+    if (req.user!.role === 'member') {
+      const bookedCount = session.bookings.filter((b) => b.status === 'booked').length;
+      const waitlistedCount = session.bookings.filter((b) => b.status === 'waitlisted').length;
+      const spotsRemaining = Math.max(0, session.capacity - bookedCount);
+      const myBooking = session.bookings.find((b) => b.memberId === req.user!.userId);
+
+      return res.json({
+        id: session.id,
+        classId: session.classId,
+        classTitle: session.class.title,
+        title: session.class.title,
+        description: session.class.description,
+        discipline: session.class.discipline,
+        date: session.date,
+        time: session.startTime,
+        startTime: session.startTime,
+        duration: session.duration,
+        capacity: session.capacity,
+        room: session.room,
+        instructorName: session.primaryInstructor?.name || 'Studio Instructor',
+        primaryInstructor: session.primaryInstructor ? { id: session.primaryInstructor.id, name: session.primaryInstructor.name } : null,
+        coInstructors: coInstructorList.map(ci => ({ id: ci.id, name: ci.name })),
+        spotsRemaining,
+        isFull: spotsRemaining === 0,
+        waitlistedCount,
+        myBookingStatus: myBooking ? myBooking.status : null,
+        class: session.class,
+        // STRICT PRIVACY: under no circumstances leak other members' details
+        bookings: myBooking ? [{ id: myBooking.id, status: myBooking.status, createdAt: myBooking.createdAt }] : [],
+      });
+    }
 
     // Instructors can only view sessions they teach (primary or co-instructor)
     if (req.user!.role === 'instructor') {

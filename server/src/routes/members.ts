@@ -10,10 +10,11 @@ const router = Router();
 router.use(authenticate);
 
 // ── GET /api/members ───────────────────────────────────────────────────────────
-// List all members with optional search by name or email.
+// List all members with optional search by name or email (staff & instructors only).
 
 router.get(
   '/',
+  requireRole('staff', 'instructor'),
   asyncHandler(async (req, res) => {
     const search = req.query.search as string | undefined;
 
@@ -84,6 +85,11 @@ router.get(
   asyncHandler(async (req, res) => {
     const id = getIdParam(req.params.id);
     if (isNaN(id)) return errorResponse(res, 400, 'Invalid member ID');
+
+    // Strict Member Privacy: A member can only view their own profile
+    if (req.user!.role === 'member' && req.user!.userId !== id) {
+      return errorResponse(res, 403, 'Access forbidden: you can only view your own member profile');
+    }
 
     const member = await db.query.members.findFirst({
       where: eq(members.id, id),

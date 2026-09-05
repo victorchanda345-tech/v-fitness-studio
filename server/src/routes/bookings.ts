@@ -45,7 +45,10 @@ router.get(
     const conditions: any[] = [];
 
     // 1. Role scoping
-    if (req.user!.role === 'instructor') {
+    if (req.user!.role === 'member') {
+      // Member can strictly only see their own bookings (privacy protection)
+      conditions.push(eq(bookings.memberId, req.user!.userId));
+    } else if (req.user!.role === 'instructor') {
       const coRecords = await db
         .select({ sessionId: sessionCoInstructors.sessionId })
         .from(sessionCoInstructors)
@@ -177,13 +180,17 @@ router.get(
 
 router.post(
   '/sessions/:sessionId/bookings',
-  requireRole('staff'),
+  requireRole('staff', 'member'),
   asyncHandler(async (req, res) => {
     const sessionId = getIdParam(req.params.sessionId);
     if (isNaN(sessionId)) return errorResponse(res, 400, 'Invalid session ID');
 
-    const { memberId, note } = req.body;
-    if (!memberId) return errorResponse(res, 400, 'memberId is required');
+    let memberIdToBook = req.body.memberId;
+    if (req.user!.role === 'member') {
+      memberIdToBook = req.user!.userId;
+    }
+    const { note } = req.body;
+    if (!memberIdToBook) return errorResponse(res, 400, 'memberId is required');
 
     // 1. Verify session exists
     const session = await db.query.sessions.findFirst({
@@ -193,7 +200,7 @@ router.post(
 
     // 2. Verify member exists
     const member = await db.query.members.findFirst({
-      where: eq(members.id, Number(memberId)),
+      where: eq(members.id, Number(memberIdToBook)),
     });
     if (!member) return errorResponse(res, 404, 'Member not found');
 
@@ -211,7 +218,7 @@ router.post(
     const existingBooking = await db.query.bookings.findFirst({
       where: and(
         eq(bookings.sessionId, sessionId),
-        eq(bookings.memberId, Number(memberId)),
+        eq(bookings.memberId, Number(memberIdToBook)),
       ),
     });
     if (existingBooking && (existingBooking.status === 'booked' || existingBooking.status === 'waitlisted')) {
@@ -240,7 +247,7 @@ router.post(
       .insert(bookings)
       .values({
         sessionId,
-        memberId: Number(memberId),
+        memberId: Number(memberIdToBook),
         status,
       })
       .returning();
@@ -250,8 +257,8 @@ router.post(
       bookingId: created.id,
       oldStatus: null,
       newStatus: status,
-      changedBy: req.user!.userId,
-      note: note || `Booking created – ${status}`,
+      changedBy: req.user!.role === 'member' ? null : req.user!.userId,
+      note: note || (req.user!.role === 'member' ? `Member self-service booking – ${status}` : `Booking created – ${status}`),
     });
 
     return res.status(201).json(created);
@@ -264,7 +271,7 @@ router.post(
 
 router.patch(
   '/bookings/:id/cancel',
-  requireRole('staff'),
+  requireRole('staff', 'member'),
   asyncHandler(async (req, res) => {
     const id = getIdParam(req.params.id);
     if (isNaN(id)) return errorResponse(res, 400, 'Invalid booking ID');
@@ -275,6 +282,10 @@ router.patch(
       where: eq(bookings.id, id),
     });
     if (!booking) return errorResponse(res, 404, 'Booking not found');
+
+    if (req.user!.role === 'member' && booking.memberId !== req.user!.userId) {
+      return errorResponse(res, 403, 'Forbidden: You can only cancel your own booking');
+    }
 
     if (booking.status === 'cancelled') {
       return errorResponse(
@@ -314,8 +325,8 @@ router.patch(
       bookingId: id,
       oldStatus: previousStatus,
       newStatus: 'cancelled',
-      changedBy: req.user!.userId,
-      note: note || 'Booking cancelled',
+      changedBy: req.user!.role === 'member' ? null : req.user!.userId,
+      note: note || (req.user!.role === 'member' ? 'Booking cancelled by member' : 'Booking cancelled'),
     });
 
     // If the cancelled booking was "booked", promote the earliest waitlisted
@@ -340,7 +351,7 @@ router.patch(
           bookingId: nextWaitlisted.id,
           oldStatus: 'waitlisted',
           newStatus: 'booked',
-          changedBy: req.user!.userId,
+          changedBy: req.user!.role === 'member' ? null : req.user!.userId,
           note: 'Auto-promoted from waitlist after cancellation',
         });
 
@@ -504,7 +515,14 @@ router.get(
     const id = getIdParam(req.params.id);
     if (isNaN(id)) return errorResponse(res, 400, 'Invalid booking ID');
 
-    if (req.user!.role === 'instructor') {
+    if (req.user!.role === 'member') {
+      const booking = await db.query.bookings.findFirst({
+        where: eq(bookings.id, id),
+      });
+      if (!booking || booking.memberId !== req.user!.userId) {
+        return errorResponse(res, 403, 'You can only view history for your own bookings');
+      }
+    } else if (req.user!.role === 'instructor') {
       const booking = await db.query.bookings.findFirst({
         where: eq(bookings.id, id),
         with: {
