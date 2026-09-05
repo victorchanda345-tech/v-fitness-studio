@@ -9,9 +9,12 @@ import {
   Lock,
   Clock,
   BookOpen,
-  Users
+  Users,
+  CalendarCheck
 } from 'lucide-react';
 import { ArticleModal, EditorialArticle } from '../components/ArticleModal';
+import { MemberPortalModal } from '../components/MemberPortalModal';
+import { MemberProfile } from '../api/client';
 
 interface LandingProps {
   onOpenTimetable: (studioRoom?: string, instructor?: string) => void;
@@ -21,6 +24,26 @@ interface LandingProps {
 export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<EditorialArticle | null>(null);
+  const [memberPortalOpen, setMemberPortalOpen] = useState(false);
+  const [currentMember, setCurrentMember] = useState<MemberProfile | null>(() => {
+    try {
+      const saved = localStorage.getItem('vfitness_member_profile');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleMemberChange = (member: MemberProfile | null) => {
+    setCurrentMember(member);
+    try {
+      if (member) {
+        localStorage.setItem('vfitness_member_profile', JSON.stringify(member));
+      } else {
+        localStorage.removeItem('vfitness_member_profile');
+      }
+    } catch {}
+  };
 
   const openAllTimetable = () => onOpenTimetable();
 
@@ -387,6 +410,14 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
           {/* Action CTAs */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }} className="desktop-user-info">
             <button 
+              onClick={() => setMemberPortalOpen(true)}
+              className="btn-athletic-outline"
+              style={{ padding: '0.65rem 1rem', fontSize: '0.8rem', borderColor: 'rgba(229, 36, 36, 0.4)' }}
+            >
+              <CalendarCheck size={13} color="var(--crimson-primary)" />
+              {currentMember ? `MY BOOKINGS (${currentMember.name.split(' ')[0]})` : 'MY BOOKINGS'}
+            </button>
+            <button 
               onClick={onOpenLogin}
               className="btn-athletic-outline"
               style={{ padding: '0.65rem 1rem', fontSize: '0.8rem' }}
@@ -430,6 +461,9 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
             <a href="#pricing" onClick={() => setMobileMenuOpen(false)} style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase' }}>Pricing</a>
             <a href="#contact" onClick={() => setMobileMenuOpen(false)} style={{ color: '#fff', fontSize: '0.9rem', fontWeight: 700, textTransform: 'uppercase' }}>Contact</a>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+              <button onClick={() => { setMobileMenuOpen(false); setMemberPortalOpen(true); }} className="btn-athletic-outline" style={{ width: '100%', borderColor: 'rgba(229, 36, 36, 0.4)' }}>
+                <CalendarCheck size={14} color="var(--crimson-primary)" /> MY BOOKINGS / MEMBER PORTAL
+              </button>
               <button onClick={() => { setMobileMenuOpen(false); onOpenTimetable(); }} className="btn-crimson" style={{ width: '100%' }}>
                 BOOK A CLASS →
               </button>
@@ -1442,6 +1476,18 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
           }}
         />
       )}
+
+      {/* ── Member Self-Service Portal Modal ──────────────────────────────────── */}
+      <MemberPortalModal
+        isOpen={memberPortalOpen}
+        onClose={() => setMemberPortalOpen(false)}
+        currentMember={currentMember}
+        onMemberChange={handleMemberChange}
+        onBrowseClasses={() => {
+          setMemberPortalOpen(false);
+          openAllTimetable();
+        }}
+      />
 
     </div>
   );

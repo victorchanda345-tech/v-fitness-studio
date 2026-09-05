@@ -61,21 +61,22 @@ Mark each honestly. Partial is fine — say what is partial.
 | S1 | Public class schedule page | Done | Unauthenticated public timetable endpoint (`GET /api/public/schedule`) and responsive public interface (`PublicSchedule.tsx`). Displays real-time spot availability, discipline filter chips, date selector, instructor rosters, and direct authentication entry points. |
 | S2 | Instructor payroll based on sessions taught | Done | Instructor payroll reporting engine (`GET /api/reports/payroll`) and management portal (`Payroll.tsx`). Calculates compensation for completed sessions taught across custom date windows. Features configurable base rates (₹50 primary / ₹35 co-instructor), executive KPI cards, itemized session audit drawers, and one-click CSV export. |
 | S3 | Room utilization reporting | Done | Studio room utilization analytics (`GET /api/reports/room-utilization`) and visualization interface (`RoomUtilization.tsx`). Analyzes room occupancy percentages, booked classroom hours against customizable operational windows (e.g., 12 hours/day), member capacity fill rates, and peak usage distributions (Morning, Afternoon, Evening). |
+| S4 | Online self-service booking & waitlist visibility for members | Done | Production-grade member self-service booking engine (`POST /api/public/bookings`, `PATCH /api/public/bookings/:id/cancel`, `GET /api/public/members/:email/bookings`, `POST /api/public/members/verify`). Members can directly reserve class spots online, join waitlists with real-time waitlist position tracking (#1, #2, etc.), track membership expiry validity, view upcoming sessions, and self-cancel with immediate auto-promotion for waiting members. Integrated into both schedule and landing page via `MemberBookingModal.tsx` and `MemberPortalModal.tsx`. |
 
 ## How much time did you actually spend?
 
-Approximately 7–8 hours total, allocated as follows:
+Approximately 8–9 hours total, allocated as follows:
 - 1.5 hours: Architecture review, database schema design, and constraint modeling (co-instructor relations, alert dismissal tracking, and immutable audit history).
-- 2.5 hours: Backend API development and business logic validation (schedule generator conflict detection, pagination, role-based settlement authorization, CSV export, and analytics aggregation).
-- 2.5 hours: Frontend UI engineering (responsive Bookings view, Membership Alerts center, Dashboard analytics cards & 8-week chart, recurring generator modal, and co-instructor management).
-- 1 hour: End-to-end integration testing, visual regression verification, and automated build verification.
+- 3.0 hours: Backend API development and business logic validation (schedule generator conflict detection, pagination, role-based settlement authorization, member self-service endpoints, CSV export, and analytics aggregation).
+- 3.0 hours: Frontend UI engineering (responsive Bookings view, Membership Alerts center, Dashboard analytics cards & 8-week chart, recurring generator modal, member self-service booking modal, and member portal drawer).
+- 1.0 hour: End-to-end integration testing, visual regression verification, and automated build verification.
 
 ## What would you do next, with another 12 hours?
 
 1. **Automated Messaging & Notification Queue**: Integrate transactional email and SMS dispatch (e.g., Resend, Twilio) backed by a Redis/BullMQ background queue to immediately notify waitlisted members upon auto-promotion or membership expiration.
 2. **Real-Time WebSocket State Synchronization**: Deploy Server-Sent Events (SSE) or WebSockets to broadcast live booking updates, capacity shifts, and check-ins across staff and instructor dashboards without requiring manual polling.
 3. **Interactive Visual Calendar Grid**: Implement a full interactive weekly timetable grid (e.g., drag-and-drop rescheduling, multi-room calendar views) for effortless studio schedule planning.
-4. **Member Self-Service Portal**: Expand the public interface into a dedicated member portal where clients can authenticate, self-book sessions, monitor waitlist rankings, and manage account preferences.
+4. **Member Mobile PWA & Push Notifications**: Package the member self-service experience into an installable progressive web app (PWA) with native calendar sync and push reminders 2 hours before class.
 
 ## What are you least happy with in this codebase, and why?
 

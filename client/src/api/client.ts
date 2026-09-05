@@ -558,4 +558,79 @@ export const api = {
     const qs = q.toString();
     return request<RoomUtilizationReport>(`/reports/room-utilization${qs ? `?${qs}` : ''}`);
   },
+
+  // Member Online Self-Service Booking (Stretch Feature)
+  verifyMemberOnline: (email: string, name?: string) =>
+    request<{ exists: boolean; member?: MemberProfile; message?: string }>('/public/members/verify', {
+      method: 'POST',
+      body: JSON.stringify({ email, name }),
+    }),
+
+  getMemberOnlineBookings: (email: string) =>
+    request<MemberBookingsResponse>(`/public/members/${encodeURIComponent(email)}/bookings`),
+
+  createMemberOnlineBooking: (data: { sessionId: number; email: string; name?: string }) =>
+    request<MemberBookingCreateResponse>('/public/bookings', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  cancelMemberOnlineBooking: (bookingId: number, email: string) =>
+    request<MemberBookingCancelResponse>(`/public/bookings/${bookingId}/cancel`, {
+      method: 'PATCH',
+      body: JSON.stringify({ email }),
+    }),
 };
+
+// ── Member Self-Service Types ─────────────────────────────────────────────────
+
+export interface MemberProfile {
+  id: number;
+  name: string;
+  email: string;
+  membershipExpiry: string;
+  isExpired: boolean;
+  daysRemaining: number;
+}
+
+export interface MemberSelfServiceBooking {
+  id: number;
+  sessionId: number;
+  status: 'booked' | 'waitlisted' | 'cancelled' | 'attended' | 'no_show';
+  createdAt: string;
+  waitlistPosition?: number;
+  session: {
+    id: number;
+    classTitle: string;
+    discipline: string;
+    date: string;
+    startTime: string;
+    duration: number;
+    room: string;
+    primaryInstructor: string;
+  };
+  member?: {
+    id: number;
+    name: string;
+    email: string;
+    membershipExpiry: string;
+  };
+}
+
+export interface MemberBookingsResponse {
+  member: MemberProfile;
+  bookings: MemberSelfServiceBooking[];
+}
+
+export interface MemberBookingCreateResponse {
+  success: boolean;
+  booking: MemberSelfServiceBooking;
+  message: string;
+}
+
+export interface MemberBookingCancelResponse {
+  success: boolean;
+  promotedMemberName?: string | null;
+  message: string;
+}
+

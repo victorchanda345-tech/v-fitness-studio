@@ -7,10 +7,15 @@ import {
   MapPin, 
   Users, 
   LogIn, 
-  ChevronRight, 
   AlertCircle,
-  ArrowLeft
+  ArrowLeft,
+  CalendarCheck,
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
+import { MemberBookingModal } from '../components/MemberBookingModal';
+import { MemberPortalModal } from '../components/MemberPortalModal';
+import { MemberProfile } from '../api/client';
 
 interface PublicScheduleProps {
   onSignInClick?: () => void;
@@ -271,6 +276,47 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
   const [isSyncing, setIsSyncing] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Member Self-Service State
+  const [selectedBookingSession, setSelectedBookingSession] = useState<PublicSessionItem | null>(null);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [memberPortalOpen, setMemberPortalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [currentMember, setCurrentMember] = useState<MemberProfile | null>(() => {
+    try {
+      const saved = localStorage.getItem('vfitness_member_profile');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleMemberChange = (member: MemberProfile | null) => {
+    setCurrentMember(member);
+    try {
+      if (member) {
+        localStorage.setItem('vfitness_member_profile', JSON.stringify(member));
+      } else {
+        localStorage.removeItem('vfitness_member_profile');
+      }
+    } catch {}
+  };
+
+  const refreshSchedule = async () => {
+    try {
+      setIsSyncing(true);
+      const data = await api.getPublicSchedule();
+      setSessions(data.sessions);
+      setDisciplines(data.disciplines);
+      try {
+        localStorage.setItem('vfitness_public_schedule', JSON.stringify(data));
+      } catch {}
+    } catch (err) {
+      console.error('Failed to refresh schedule', err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   // Filters
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
   const [selectedRoom, setSelectedRoom] = useState<string>(initialRoom);
@@ -375,19 +421,36 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
           {onBackToHome && (
             <button onClick={onBackToHome} className="btn btn-secondary btn-sm">
               <ArrowLeft size={14} /> Back to Overview
             </button>
           )}
+
+          {/* Member Self-Service Portal Access */}
+          <button 
+            type="button"
+            onClick={() => setMemberPortalOpen(true)} 
+            className="btn btn-secondary btn-sm"
+            style={{ 
+              borderColor: 'rgba(229, 36, 36, 0.45)', 
+              backgroundColor: 'rgba(229, 36, 36, 0.1)',
+              color: '#ffffff',
+              fontWeight: 700
+            }}
+          >
+            <CalendarCheck size={14} color="var(--crimson-primary)" />
+            {currentMember ? `My Bookings (${currentMember.name.split(' ')[0]})` : 'My Bookings / Member Portal'}
+          </button>
+
           {user ? (
             <button onClick={onBackToApp} className="btn btn-secondary btn-sm">
               <ArrowLeft size={14} /> Back to Dashboard
             </button>
           ) : (
             <button onClick={onSignInClick} className="btn btn-primary btn-sm">
-              <LogIn size={14} /> Staff / Instructor Login
+              <LogIn size={14} /> Staff Login
             </button>
           )}
         </div>
@@ -745,17 +808,34 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
                         </div>
                       </div>
 
-                      {/* Action Button */}
+                      {/* Member Self-Service Booking Action Button */}
                       <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.85rem' }}>
-                        {user ? (
-                          <button onClick={onBackToApp} className="btn btn-primary btn-sm" style={{ width: '100%' }}>
-                            Manage Booking in StudioPulse <ChevronRight size={14} />
-                          </button>
-                        ) : (
-                          <button onClick={onSignInClick} className="btn btn-secondary btn-sm" style={{ width: '100%' }}>
-                            Sign In to Reserve a Spot <ChevronRight size={14} />
-                          </button>
-                        )}
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setSelectedBookingSession(s);
+                            setBookingModalOpen(true);
+                          }}
+                          className={s.isFull ? 'btn btn-secondary btn-sm' : 'btn btn-primary btn-sm'} 
+                          style={{ 
+                            width: '100%', 
+                            justifyContent: 'center',
+                            padding: '0.65rem 1rem',
+                            fontWeight: 700,
+                            letterSpacing: '0.04em',
+                            textTransform: 'uppercase'
+                          }}
+                        >
+                          {s.isFull ? (
+                            <>
+                              <Users size={14} /> Join Waitlist ({s.waitlistedCount} Waiting)
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles size={14} /> Book Class Spot ({s.spotsRemaining} Left) →
+                            </>
+                          )}
+                        </button>
                       </div>
                     </div>
                   ))}
@@ -788,6 +868,62 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
           </button>
         </div>
       )}
+
+      {/* Toast feedback banner */}
+      {toastMessage && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          backgroundColor: '#0D0E13',
+          border: '1px solid var(--crimson-primary)',
+          color: '#ffffff',
+          borderRadius: '8px',
+          padding: '0.85rem 1.25rem',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(229, 36, 36, 0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.65rem',
+          zIndex: 1200,
+          animation: 'fadeIn 0.2s ease',
+        }}>
+          <CheckCircle2 size={18} color="var(--crimson-primary)" />
+          <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Member Self-Service Booking Modal */}
+      <MemberBookingModal
+        isOpen={bookingModalOpen}
+        onClose={() => {
+          setBookingModalOpen(false);
+          setSelectedBookingSession(null);
+        }}
+        session={selectedBookingSession}
+        currentMember={currentMember}
+        onMemberIdentified={handleMemberChange}
+        onBookingComplete={(b) => {
+          refreshSchedule();
+          setToastMessage(b.status === 'booked' ? 'Class spot confirmed successfully!' : 'Added to waitlist!');
+          setTimeout(() => setToastMessage(null), 4000);
+        }}
+        onOpenMyBookings={() => {
+          setBookingModalOpen(false);
+          setMemberPortalOpen(true);
+        }}
+      />
+
+      {/* Member Self-Service Portal (My Bookings & Cancellations) */}
+      <MemberPortalModal
+        isOpen={memberPortalOpen}
+        onClose={() => setMemberPortalOpen(false)}
+        currentMember={currentMember}
+        onMemberChange={handleMemberChange}
+        onBrowseClasses={() => setMemberPortalOpen(false)}
+        onBookingCancelled={() => {
+          refreshSchedule();
+        }}
+      />
     </div>
   );
 };
