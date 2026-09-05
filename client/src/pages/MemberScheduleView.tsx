@@ -44,12 +44,13 @@ export const MemberScheduleView: React.FC<MemberScheduleViewProps> = ({ initialT
       setLoading(true);
       setMessage(null);
 
-      // 1. Fetch read-only upcoming sessions list (class title, date, time, room, instructor name, spots remaining)
-      const sessionsData = await api.getMemberUpcomingSessions(user.email);
-      setSessions(sessionsData.sessions || []);
+      // Fetch read-only upcoming sessions list and member's personal bookings in parallel for maximum speed
+      const [sessionsData, bookingsData] = await Promise.all([
+        api.getMemberUpcomingSessions(user.email),
+        api.getMemberOnlineBookings(user.email)
+      ]);
 
-      // 2. Fetch member's personal bookings
-      const bookingsData = await api.getMemberOnlineBookings(user.email);
+      setSessions(sessionsData.sessions || []);
       setBookings(bookingsData.bookings || []);
     } catch (err: any) {
       setMessage({

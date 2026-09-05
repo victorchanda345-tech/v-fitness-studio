@@ -81,50 +81,56 @@ const MainApp: React.FC = () => {
   if (!user) {
     if (publicView === 'timetable') {
       return (
-        <PublicSchedule 
-          initialRoom={selectedStudioRoom}
-          initialInstructor={selectedInstructor}
-          initialDiscipline={selectedDiscipline}
-          onSignInClick={() => setPublicView('login')} 
-          onBackToHome={() => {
-            setSelectedStudioRoom('all');
-            setSelectedInstructor('all');
-            setSelectedDiscipline('all');
-            setPublicView('landing');
-          }}
-        />
+        <div className="animate-fade-in" key="timetable">
+          <PublicSchedule 
+            initialRoom={selectedStudioRoom}
+            initialInstructor={selectedInstructor}
+            initialDiscipline={selectedDiscipline}
+            onSignInClick={() => setPublicView('login')} 
+            onBackToHome={() => {
+              setSelectedStudioRoom('all');
+              setSelectedInstructor('all');
+              setSelectedDiscipline('all');
+              setPublicView('landing');
+            }}
+          />
+        </div>
       );
     }
 
     if (publicView === 'login') {
       return (
-        <Login 
-          onViewSchedule={() => {
-            setSelectedStudioRoom('all');
-            setSelectedInstructor('all');
-            setSelectedDiscipline('all');
-            setPublicView('timetable');
-          }} 
-          onBackToHome={() => {
-            setSelectedStudioRoom('all');
-            setSelectedInstructor('all');
-            setSelectedDiscipline('all');
-            setPublicView('landing');
-          }}
-        />
+        <div className="animate-fade-in" key="login">
+          <Login 
+            onViewSchedule={() => {
+              setSelectedStudioRoom('all');
+              setSelectedInstructor('all');
+              setSelectedDiscipline('all');
+              setPublicView('timetable');
+            }} 
+            onBackToHome={() => {
+              setSelectedStudioRoom('all');
+              setSelectedInstructor('all');
+              setSelectedDiscipline('all');
+              setPublicView('landing');
+            }}
+          />
+        </div>
       );
     }
 
     return (
-      <Landing 
-        onOpenTimetable={(studioRoom?: string, instructor?: string, discipline?: string) => {
-          setSelectedStudioRoom(studioRoom || 'all');
-          setSelectedInstructor(instructor || 'all');
-          setSelectedDiscipline(discipline || 'all');
-          setPublicView('timetable');
-        }}
-        onOpenLogin={() => setPublicView('login')}
-      />
+      <div className="animate-fade-in" key="landing">
+        <Landing 
+          onOpenTimetable={(studioRoom?: string, instructor?: string, discipline?: string) => {
+            setSelectedStudioRoom(studioRoom || 'all');
+            setSelectedInstructor(instructor || 'all');
+            setSelectedDiscipline(discipline || 'all');
+            setPublicView('timetable');
+          }}
+          onOpenLogin={() => setPublicView('login')}
+        />
+      </div>
     );
   }
 
@@ -148,7 +154,7 @@ const MainApp: React.FC = () => {
         alertsCount={alertsCount} 
       />
       
-      <main style={{ flex: 1, padding: '0 1.5rem 3rem 1.5rem' }}>
+      <main className="animate-fade-in" key={`${activeTab}-${selectedClassId || ''}-${selectedSessionId || ''}`} style={{ flex: 1, padding: '0 1.5rem 3rem 1.5rem' }}>
         {isMember ? (
           <MemberScheduleView initialTab={activeTab === 'bookings' ? 'bookings' : 'sessions'} />
         ) : (

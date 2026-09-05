@@ -234,6 +234,7 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
           flexDirection: 'column',
           maxHeight: '90vh',
           boxSizing: 'border-box',
+          animation: 'fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         }}
       >
         {/* Header */}

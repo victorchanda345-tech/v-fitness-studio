@@ -87,7 +87,8 @@ export const ArticleModal: React.FC<ArticleModalProps> = ({ article, onClose }) 
           flexDirection: 'column',
           boxShadow: '0 24px 70px rgba(0, 0, 0, 0.9), 0 0 30px rgba(229, 36, 36, 0.12)',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          animation: 'fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         }}
         onClick={(e) => e.stopPropagation()}
       >

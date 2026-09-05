@@ -156,6 +156,7 @@ export const MemberPortalModal: React.FC<MemberPortalModalProps> = ({
           flexDirection: 'column',
           maxHeight: '88vh',
           boxSizing: 'border-box',
+          animation: 'fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         }}
       >
         {/* Modal Header */}
