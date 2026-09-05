@@ -430,7 +430,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               className="btn-crimson"
               style={{ padding: '0.65rem 1.35rem', fontSize: '0.8rem' }}
             >
-              BOOK A CLASS →
+              BOOK A CLASS
             </button>
           </div>
 
@@ -465,7 +465,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                 <CalendarCheck size={14} color="var(--crimson-primary)" /> MY BOOKINGS / MEMBER PORTAL
               </button>
               <button onClick={() => { setMobileMenuOpen(false); onOpenTimetable(); }} className="btn-crimson" style={{ width: '100%' }}>
-                BOOK A CLASS →
+                BOOK A CLASS
               </button>
               <button onClick={() => { setMobileMenuOpen(false); onOpenLogin(); }} className="btn-athletic-outline" style={{ width: '100%' }}>
                 STAFF LOGIN
@@ -531,7 +531,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                 className="btn-crimson"
                 style={{ padding: '1rem 2.2rem', fontSize: '0.95rem' }}
               >
-                BOOK A SESSION →
+                BOOK A SESSION
               </button>
               <a 
                 href="#programs" 
@@ -666,7 +666,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               className="btn-crimson"
               style={{ fontSize: '0.825rem', padding: '0.65rem 1.25rem' }}
             >
-              VIEW ALL SESSIONS →
+              VIEW ALL SESSIONS
             </button>
           </div>
         </div>
@@ -774,7 +774,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                       gap: '0.35rem'
                     }}
                   >
-                    BOOK CLASS →
+                    BOOK CLASS
                   </button>
                 </div>
               </div>
@@ -822,7 +822,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               className="btn-athletic-outline"
               style={{ fontSize: '0.8rem', padding: '0.65rem 1.25rem' }}
             >
-              EXPLORE SCHEDULE →
+              EXPLORE SCHEDULE
             </button>
           </div>
 
@@ -953,7 +953,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                         e.currentTarget.style.color = 'var(--crimson-primary)';
                       }}
                     >
-                      READ MORE →
+                      READ ARTICLE
                     </button>
                   </div>
                 </div>
@@ -1046,7 +1046,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                   e.currentTarget.style.transform = 'none';
                 }}
               >
-                VIEW {st.name.toUpperCase()} TIMETABLE →
+                VIEW {st.name.toUpperCase()} TIMETABLE
               </button>
             </div>
           ))}
@@ -1159,7 +1159,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                     e.currentTarget.style.transform = 'none';
                   }}
                 >
-                  VIEW {ins.name.toUpperCase()} SESSIONS →
+                  VIEW {ins.name.toUpperCase()} SESSIONS
                 </button>
               </div>
             ))}
@@ -1263,7 +1263,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                 className={tier.isFeatured ? 'btn-crimson' : 'btn-athletic-outline'}
                 style={{ width: '100%', justifyContent: 'center' }}
               >
-                SELECT PLAN →
+                SELECT PLAN
               </button>
             </div>
           ))}
@@ -1361,7 +1361,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                 className="btn-crimson"
                 style={{ width: '100%', justifyContent: 'center', padding: '1rem' }}
               >
-                OPEN LIVE TIMETABLE →
+                OPEN LIVE TIMETABLE
               </button>
 
               <button 
@@ -1438,7 +1438,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                 cursor: 'pointer'
               }}
             >
-              TIMETABLE →
+              TIMETABLE
             </button>
           </div>
         </div>

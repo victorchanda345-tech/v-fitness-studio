@@ -247,7 +247,7 @@ export const MemberPortalModal: React.FC<MemberPortalModalProps> = ({
                   className="btn-crimson"
                   style={{ width: '100%', padding: '0.85rem', justifyContent: 'center' }}
                 >
-                  {loading ? 'LOOKING UP PROFILE…' : 'ACCESS MEMBER PORTAL →'}
+                  {loading ? 'LOOKING UP PROFILE...' : 'ACCESS MEMBER PORTAL'}
                 </button>
               </form>
             </div>
@@ -647,7 +647,7 @@ export const MemberPortalModal: React.FC<MemberPortalModalProps> = ({
                       className="btn-crimson"
                       style={{ padding: '0.65rem 1.25rem', fontSize: '0.825rem' }}
                     >
-                      BROWSE CLASS SCHEDULE →
+                      BROWSE CLASS SCHEDULE
                     </button>
                   </div>
                 ) : (

@@ -408,7 +408,7 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
                   className="btn-crimson"
                   style={{ padding: '0.75rem 1.5rem', fontSize: '0.85rem' }}
                 >
-                  VIEW MY BOOKINGS →
+                  VIEW MY BOOKINGS
                 </button>
                 <button
                   type="button"
@@ -491,7 +491,7 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
                   className="btn-crimson"
                   style={{ padding: '0.75rem 1.4rem', fontSize: '0.85rem' }}
                 >
-                  VIEW IN MY BOOKINGS →
+                  VIEW IN MY BOOKINGS
                 </button>
                 {existingBooking.id > 0 && (
                   <button
@@ -672,7 +672,7 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
                   className="btn-crimson"
                   style={{ flex: 2, padding: '0.85rem', justifyContent: 'center', opacity: submitting ? 0.7 : 1 }}
                 >
-                  {submitting ? 'RESERVING SPOT…' : isFull ? 'JOIN WAITLIST →' : 'CONFIRM CLASS SPOT →'}
+                  {submitting ? 'RESERVING SPOT...' : isFull ? 'JOIN WAITLIST' : 'CONFIRM CLASS SPOT'}
                 </button>
               </div>
 

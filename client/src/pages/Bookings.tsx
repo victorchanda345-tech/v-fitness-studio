@@ -518,7 +518,7 @@ export const Bookings: React.FC<BookingsProps> = ({ onNavigateToSession }) => {
                       {log.oldStatus
                         ? log.oldStatus === log.newStatus
                           ? `Staff Note (${log.newStatus})`
-                          : `${log.oldStatus} -> ${log.newStatus}`
+                          : `${log.oldStatus} to ${log.newStatus}`
                         : `Created as ${log.newStatus}`}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>

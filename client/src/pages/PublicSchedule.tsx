@@ -1020,7 +1020,7 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
                                 </>
                               ) : (
                                 <>
-                                  <CalendarCheck size={14} /> Book Class Spot ({s.spotsRemaining} Left) →
+                                  <CalendarCheck size={14} /> Book Class Spot ({s.spotsRemaining} Left)
                                 </>
                               )}
                             </button>
