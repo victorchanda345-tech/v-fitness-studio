@@ -12,8 +12,7 @@ import {
   UserX, 
   CalendarCheck, 
   BarChart3, 
-  Layers, 
-  Sparkles 
+  Layers
 } from 'lucide-react';
 
 interface DashboardProps {
@@ -319,7 +318,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         {/* Class Breakdown */}
         <div className="glass-panel" style={{ padding: '1.5rem' }}>
           <h2 style={{ fontSize: '1.15rem', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <Sparkles size={18} color="var(--accent-purple)" /> Bookings by Class
+            <BarChart3 size={18} color="var(--crimson-primary)" /> Bookings by Class
           </h2>
 
           <div style={{ maxHeight: '240px', overflowY: 'auto' }}>

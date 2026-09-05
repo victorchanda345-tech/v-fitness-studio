@@ -10,7 +10,6 @@ import {
   AlertCircle,
   ArrowLeft,
   CalendarCheck,
-  Sparkles,
   CheckCircle2
 } from 'lucide-react';
 import { MemberBookingModal } from '../components/MemberBookingModal';
@@ -832,7 +831,7 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
                             </>
                           ) : (
                             <>
-                              <Sparkles size={14} /> Book Class Spot ({s.spotsRemaining} Left) →
+                              <CalendarCheck size={14} /> Book Class Spot ({s.spotsRemaining} Left) →
                             </>
                           )}
                         </button>

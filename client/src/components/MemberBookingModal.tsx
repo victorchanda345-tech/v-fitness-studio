@@ -8,7 +8,7 @@ import {
   Users, 
   CheckCircle2, 
   AlertCircle, 
-  Sparkles, 
+  CalendarCheck, 
   ShieldCheck
 } from 'lucide-react';
 import { 
@@ -172,7 +172,7 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
               gap: '0.4rem',
               marginBottom: '0.2rem',
             }}>
-              <Sparkles size={13} />
+              <CalendarCheck size={13} />
               MEMBER SELF-SERVICE BOOKING
             </div>
             <h3 className="font-display" style={{ fontSize: '1.45rem', color: '#ffffff', letterSpacing: '0.02em' }}>
