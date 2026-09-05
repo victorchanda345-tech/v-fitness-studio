@@ -17,6 +17,7 @@ interface PublicScheduleProps {
   onBackToApp?: () => void;
   onBackToHome?: () => void;
   initialRoom?: string;
+  initialInstructor?: string;
 }
 
 const formatYMD = (d: Date) => {
@@ -45,7 +46,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       capacity: 15,
       room: 'Studio A (Main Movement Hall)',
       primaryInstructor: 'Aarav Mehta',
-      coInstructors: ['Ananya Iyer'],
+      coInstructors: ['Ananya Roy'],
       spotsRemaining: 4,
       isFull: false,
       waitlistedCount: 0,
@@ -61,7 +62,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       capacity: 10,
       room: 'Studio C (HIIT & Functional Rig)',
       primaryInstructor: 'Victor Chanda',
-      coInstructors: ['Rohan Verma'],
+      coInstructors: ['Rahul Verma'],
       spotsRemaining: 2,
       isFull: false,
       waitlistedCount: 0,
@@ -76,8 +77,8 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       duration: 50,
       capacity: 12,
       room: 'Studio B (Mind & Core Studio)',
-      primaryInstructor: 'Ananya Iyer',
-      coInstructors: [],
+      primaryInstructor: 'Rahul Verma',
+      coInstructors: ['Ananya Roy'],
       spotsRemaining: 1,
       isFull: false,
       waitlistedCount: 0,
@@ -92,7 +93,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       duration: 60,
       capacity: 15,
       room: 'Studio A (Main Movement Hall)',
-      primaryInstructor: 'Rohan Verma',
+      primaryInstructor: 'Priya Patel',
       coInstructors: ['Aarav Mehta'],
       spotsRemaining: 8,
       isFull: false,
@@ -124,8 +125,8 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       duration: 60,
       capacity: 12,
       room: 'Studio B (Mind & Core Studio)',
-      primaryInstructor: 'Aarav Mehta',
-      coInstructors: [],
+      primaryInstructor: 'Ananya Roy',
+      coInstructors: ['Aarav Mehta'],
       spotsRemaining: 6,
       isFull: false,
       waitlistedCount: 0,
@@ -141,8 +142,56 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       capacity: 10,
       room: 'Studio C (HIIT & Functional Rig)',
       primaryInstructor: 'Victor Chanda',
-      coInstructors: ['Rohan Verma'],
+      coInstructors: ['Rahul Verma'],
       spotsRemaining: 3,
+      isFull: false,
+      waitlistedCount: 0,
+    },
+    {
+      id: 108,
+      classTitle: 'Bhangra Rhythm & Cardio Burn',
+      description: 'High-intensity rhythm dance intervals engineered for peak endurance and cardio conditioning.',
+      discipline: 'Dance',
+      date: d0,
+      startTime: '17:00',
+      duration: 50,
+      capacity: 15,
+      room: 'Studio A (Main Movement Hall)',
+      primaryInstructor: 'Priya Patel',
+      coInstructors: [],
+      spotsRemaining: 7,
+      isFull: false,
+      waitlistedCount: 0,
+    },
+    {
+      id: 109,
+      classTitle: 'Classical Mat Pilates Mechanics',
+      description: 'Spinal rehabilitation, posterior chain stabilization, and core postural control.',
+      discipline: 'Pilates',
+      date: d1,
+      startTime: '11:00',
+      duration: 50,
+      capacity: 12,
+      room: 'Studio B (Mind & Core Studio)',
+      primaryInstructor: 'Rahul Verma',
+      coInstructors: [],
+      spotsRemaining: 4,
+      isFull: false,
+      waitlistedCount: 0,
+    },
+    {
+      id: 110,
+      classTitle: 'Ashtanga Vinyasa Flow & Breath',
+      description: 'Traditional alignment-focused asana sequencing, kinetic hip opening, and pranayama.',
+      discipline: 'Yoga',
+      date: d1,
+      startTime: '07:00',
+      duration: 60,
+      capacity: 15,
+      room: 'Studio A (Main Movement Hall)',
+      primaryInstructor: 'Ananya Roy',
+      coInstructors: [],
+      spotsRemaining: 5,
       isFull: false,
       waitlistedCount: 0,
     },
@@ -175,11 +224,44 @@ export const normalizeRoom = (roomStr: string) => {
   return roomStr;
 };
 
+export const matchesInstructorName = (sessionInstructor: string, filterInstructor: string): boolean => {
+  if (!filterInstructor || filterInstructor === 'all') return true;
+  const fLower = filterInstructor.toLowerCase().trim();
+  const sLower = (sessionInstructor || '').toLowerCase().trim();
+  if (!sLower) return false;
+  if (sLower === fLower) return true;
+  if (sLower.includes(fLower) || fLower.includes(sLower)) return true;
+
+  // First name match (e.g. Victor, Priya, Ananya, Rahul/Rohan, Aarav)
+  const fFirst = fLower.split(' ')[0];
+  const sFirst = sLower.split(' ')[0];
+  if (fFirst && sFirst && fFirst === sFirst) return true;
+
+  // Cross-system name aliases (e.g. Ananya Roy / Ananya Iyer, Rahul Verma / Rohan Verma)
+  if (fLower.includes('ananya') && sLower.includes('ananya')) return true;
+  if (fLower.includes('verma') && sLower.includes('verma')) return true;
+  if (fLower.includes('victor') && sLower.includes('victor')) return true;
+  if (fLower.includes('priya') && sLower.includes('priya')) return true;
+  if (fLower.includes('aarav') && sLower.includes('aarav')) return true;
+
+  return false;
+};
+
+export const COACH_OPTIONS = [
+  { id: 'all', label: 'All Coaches' },
+  { id: 'Victor Chanda', label: 'Victor Chanda • Head Coach' },
+  { id: 'Ananya Roy', label: 'Ananya Roy • Movement Coach' },
+  { id: 'Rahul Verma', label: 'Rahul Verma • Pilates Specialist' },
+  { id: 'Priya Patel', label: 'Priya Patel • Cardio & Dance Lead' },
+  { id: 'Aarav Mehta', label: 'Aarav Mehta • Mobility Coach' },
+];
+
 export const PublicSchedule: React.FC<PublicScheduleProps> = ({ 
   onSignInClick, 
   onBackToApp,
   onBackToHome,
-  initialRoom = 'all'
+  initialRoom = 'all',
+  initialInstructor = 'all'
 }) => {
   const { user } = useAuth();
   const initialData = getCachedSchedule();
@@ -192,14 +274,21 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
   // Filters
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
   const [selectedRoom, setSelectedRoom] = useState<string>(initialRoom);
+  const [selectedInstructor, setSelectedInstructor] = useState<string>(initialInstructor);
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('');
 
-  // Keep selectedRoom in sync if initialRoom changes
+  // Keep filters in sync if props change
   useEffect(() => {
     if (initialRoom) {
       setSelectedRoom(initialRoom);
     }
   }, [initialRoom]);
+
+  useEffect(() => {
+    if (initialInstructor) {
+      setSelectedInstructor(initialInstructor);
+    }
+  }, [initialInstructor]);
 
   useEffect(() => {
     let isMounted = true;
@@ -245,7 +334,12 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
       sessionRoomNorm.toLowerCase() === selectedRoomNorm.toLowerCase() ||
       s.room.toLowerCase().includes(selectedRoom.toLowerCase());
 
-    return matchesDiscipline && matchesDate && matchesRoom;
+    const matchesInstructor =
+      selectedInstructor === 'all' ||
+      matchesInstructorName(s.primaryInstructor, selectedInstructor) ||
+      (Array.isArray(s.coInstructors) && s.coInstructors.some((co) => matchesInstructorName(co, selectedInstructor)));
+
+    return matchesDiscipline && matchesDate && matchesRoom && matchesInstructor;
   });
 
   // Group by date for readable agenda view
@@ -379,7 +473,32 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
 
           <div style={{ height: '1px', backgroundColor: 'var(--border-subtle)' }} />
 
-          {/* Row 2: Discipline & Date Filter */}
+          {/* Row 2: Coach / Instructor Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, minWidth: '95px', letterSpacing: '0.04em' }}>
+              COACH:
+            </span>
+            {COACH_OPTIONS.map((co) => {
+              const isActive = co.id === 'all' 
+                ? selectedInstructor === 'all' 
+                : matchesInstructorName(co.id, selectedInstructor);
+              return (
+                <button
+                  key={co.id}
+                  type="button"
+                  onClick={() => setSelectedInstructor(co.id)}
+                  className={`btn ${isActive ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  style={{ borderRadius: '20px', padding: '0.35rem 0.95rem', fontSize: '0.78rem' }}
+                >
+                  {co.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div style={{ height: '1px', backgroundColor: 'var(--border-subtle)' }} />
+
+          {/* Row 3: Discipline & Date Filter */}
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.25rem' }}>
             
             {/* Discipline Pills */}
@@ -441,7 +560,7 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
           borderRadius: '6px',
           backgroundColor: 'rgba(229, 36, 36, 0.08)',
           border: '1px solid rgba(229, 36, 36, 0.3)',
-          marginBottom: '2rem',
+          marginBottom: '1.25rem',
           flexWrap: 'wrap',
           gap: '0.75rem'
         }}>
@@ -477,7 +596,57 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
             className="btn btn-secondary btn-sm"
             style={{ fontSize: '0.75rem', padding: '0.35rem 0.85rem' }}
           >
-            Show All Studios (Reset)
+            Show All Studios (Clear)
+          </button>
+        </div>
+      )}
+
+      {/* Active Coach / Instructor Indicator Banner */}
+      {selectedInstructor !== 'all' && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0.85rem 1.25rem',
+          borderRadius: '6px',
+          backgroundColor: 'rgba(229, 36, 36, 0.08)',
+          border: '1px solid rgba(229, 36, 36, 0.3)',
+          marginBottom: '2rem',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '4px',
+              backgroundColor: 'var(--crimson-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff'
+            }}>
+              <Users size={15} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ffffff' }}>
+                Classes Instructed by {selectedInstructor.toUpperCase()}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)' }}>
+                {filteredSessions.length === 0 
+                  ? `No upcoming classes currently found for ${selectedInstructor} with active filters` 
+                  : `Showing ${filteredSessions.length} session${filteredSessions.length === 1 ? '' : 's'} coached by ${selectedInstructor}`}
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setSelectedInstructor('all')}
+            className="btn btn-secondary btn-sm"
+            style={{ fontSize: '0.75rem', padding: '0.35rem 0.85rem' }}
+          >
+            Show All Coaches (Clear)
           </button>
         </div>
       )}
@@ -600,17 +769,22 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
       {!loading && sortedDates.length === 0 && (
         <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
           <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#ffffff' }}>
-            No sessions found matching {selectedRoom !== 'all' ? selectedRoom : 'the selected filters'}.
+            No sessions found matching your selected filters.
           </p>
           <p style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '1.25rem' }}>
-            Try resetting your studio room, discipline, or date filter to view upcoming sessions.
+            Try resetting your coach, studio room, discipline, or date filter to view upcoming sessions.
           </p>
           <button 
             type="button"
-            onClick={() => { setSelectedDiscipline('all'); setSelectedDateFilter(''); setSelectedRoom('all'); }} 
+            onClick={() => { 
+              setSelectedDiscipline('all'); 
+              setSelectedDateFilter(''); 
+              setSelectedRoom('all'); 
+              setSelectedInstructor('all');
+            }} 
             className="btn btn-primary btn-sm"
           >
-            Reset All Filters (Show All Studios)
+            Reset All Filters (Show All Sessions)
           </button>
         </div>
       )}

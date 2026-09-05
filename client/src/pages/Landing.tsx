@@ -14,7 +14,7 @@ import {
 import { ArticleModal, EditorialArticle } from '../components/ArticleModal';
 
 interface LandingProps {
-  onOpenTimetable: (studioRoom?: string) => void;
+  onOpenTimetable: (studioRoom?: string, instructor?: string) => void;
   onOpenLogin: () => void;
 }
 
@@ -1101,26 +1101,41 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                 </div>
 
                 <button 
-                  onClick={openAllTimetable}
+                  type="button"
+                  onClick={() => onOpenTimetable(undefined, ins.name)}
                   style={{
                     background: 'transparent',
                     border: '1px solid rgba(255, 255, 255, 0.15)',
                     borderRadius: '4px',
                     color: '#ffffff',
-                    padding: '0.6rem 1rem',
-                    fontSize: '0.75rem',
+                    padding: '0.65rem 1rem',
+                    fontSize: '0.78rem',
                     fontWeight: 700,
                     textTransform: 'uppercase',
                     letterSpacing: '0.06em',
                     cursor: 'pointer',
                     width: '100%',
                     textAlign: 'center',
-                    transition: 'all 0.2s'
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.4rem'
                   }}
-                  onMouseOver={(e) => (e.currentTarget.style.borderColor = 'var(--crimson-primary)')}
-                  onMouseOut={(e) => (e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)')}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--crimson-primary)';
+                    e.currentTarget.style.color = 'var(--crimson-primary)';
+                    e.currentTarget.style.backgroundColor = 'rgba(229, 36, 36, 0.08)';
+                    e.currentTarget.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                    e.currentTarget.style.color = '#ffffff';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                    e.currentTarget.style.transform = 'none';
+                  }}
                 >
-                  VIEW SESSIONS →
+                  VIEW {ins.name.toUpperCase()} SESSIONS →
                 </button>
               </div>
             ))}
@@ -1414,9 +1429,11 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
             const articleId = selectedArticle.id;
             setSelectedArticle(null);
             if (articleId === 'biomechanics-lifting') {
-              onOpenTimetable('Studio C');
+              onOpenTimetable('Studio C', 'Victor Chanda');
             } else if (articleId === 'relentless-consistency') {
-              onOpenTimetable('Studio B');
+              onOpenTimetable('Studio B', 'Aarav Mehta');
+            } else if (articleId === 'nutrition-timing') {
+              onOpenTimetable('Studio A', 'Priya Patel');
             } else {
               onOpenTimetable();
             }

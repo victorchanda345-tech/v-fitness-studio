@@ -27,6 +27,7 @@ const MainApp: React.FC = () => {
   const [alertsCount, setAlertsCount] = useState<number>(0);
   const [publicView, setPublicView] = useState<PublicView>('landing');
   const [selectedStudioRoom, setSelectedStudioRoom] = useState<string>('all');
+  const [selectedInstructor, setSelectedInstructor] = useState<string>('all');
 
   // Pre-warm public timetable in background and wake up server
   useEffect(() => {
@@ -68,9 +69,11 @@ const MainApp: React.FC = () => {
       return (
         <PublicSchedule 
           initialRoom={selectedStudioRoom}
+          initialInstructor={selectedInstructor}
           onSignInClick={() => setPublicView('login')} 
           onBackToHome={() => {
             setSelectedStudioRoom('all');
+            setSelectedInstructor('all');
             setPublicView('landing');
           }}
         />
@@ -82,10 +85,12 @@ const MainApp: React.FC = () => {
         <Login 
           onViewSchedule={() => {
             setSelectedStudioRoom('all');
+            setSelectedInstructor('all');
             setPublicView('timetable');
           }} 
           onBackToHome={() => {
             setSelectedStudioRoom('all');
+            setSelectedInstructor('all');
             setPublicView('landing');
           }}
         />
@@ -94,8 +99,9 @@ const MainApp: React.FC = () => {
 
     return (
       <Landing 
-        onOpenTimetable={(studioRoom?: string) => {
+        onOpenTimetable={(studioRoom?: string, instructor?: string) => {
           setSelectedStudioRoom(studioRoom || 'all');
+          setSelectedInstructor(instructor || 'all');
           setPublicView('timetable');
         }}
         onOpenLogin={() => setPublicView('login')}
@@ -183,6 +189,7 @@ const MainApp: React.FC = () => {
         {activeTab === 'public-schedule' && (
           <PublicSchedule 
             initialRoom={selectedStudioRoom}
+            initialInstructor={selectedInstructor}
             onBackToApp={() => setActiveTab('dashboard')} 
           />
         )}
