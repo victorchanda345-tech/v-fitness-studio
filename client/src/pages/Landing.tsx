@@ -531,6 +531,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               <img 
                 src="/images/hero-trainer.jpg" 
                 alt="Victor Chanda - Head Coach" 
+                loading="eager"
                 style={{
                   width: '100%',
                   height: 'auto',
@@ -831,6 +832,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                     src={article.image} 
                     alt={article.title}
                     className="photo-card-img"
+                    loading="lazy"
                   />
                   <div style={{
                     position: 'absolute',
@@ -1428,7 +1430,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
           onBookClass={() => {
             const articleId = selectedArticle.id;
             setSelectedArticle(null);
-            if (articleId === 'biomechanics-lifting') {
+            if (articleId === 'strength-principles' || articleId === 'biomechanics-lifting') {
               onOpenTimetable('Studio C', 'Victor Chanda');
             } else if (articleId === 'relentless-consistency') {
               onOpenTimetable('Studio B', 'Aarav Mehta');

@@ -49,6 +49,11 @@ const MainApp: React.FC = () => {
     }
   }, [user, isStaff, activeTab]);
 
+  // Scroll smoothly/instantly to top upon any view, tab, or detail navigation
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [publicView, activeTab, selectedClassId, selectedSessionId]);
+
   if (isLoading) {
     return (
       <div style={{
