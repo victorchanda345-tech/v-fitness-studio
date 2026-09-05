@@ -33,8 +33,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, alertsC
 
   return (
     <header style={{
-      borderBottom: '1px solid var(--border-subtle)',
-      background: 'rgba(10, 14, 23, 0.9)',
+      borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+      background: 'rgba(7, 8, 11, 0.94)',
       backdropFilter: 'blur(16px)',
       position: 'sticky',
       top: 0,
@@ -64,15 +64,15 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, alertsC
             width: '36px',
             height: '36px',
             borderRadius: '10px',
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+            background: 'linear-gradient(135deg, #E52424 0%, #991B1B 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontWeight: 800,
             fontSize: '1.1rem',
             color: '#ffffff',
-            boxShadow: '0 4px 12px rgba(37, 99, 235, 0.4)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: '0 4px 14px rgba(229, 36, 36, 0.45)',
+            border: '1px solid rgba(255, 255, 255, 0.25)',
           }}>
             V
           </div>

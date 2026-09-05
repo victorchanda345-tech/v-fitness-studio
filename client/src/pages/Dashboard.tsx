@@ -251,9 +251,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                         height: `${heightPercent}%`, 
                         borderRadius: '6px 6px 0 0',
                         background: w.attended > 0 
-                          ? 'linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)' 
+                          ? 'linear-gradient(180deg, #E52424 0%, #991B1B 100%)' 
                           : 'rgba(255, 255, 255, 0.05)',
-                        boxShadow: w.attended > 0 ? '0 0 12px rgba(59, 130, 246, 0.3)' : 'none',
+                        boxShadow: w.attended > 0 ? '0 0 12px rgba(229, 36, 36, 0.4)' : 'none',
                         transition: 'height 0.4s ease',
                       }} 
                     />
