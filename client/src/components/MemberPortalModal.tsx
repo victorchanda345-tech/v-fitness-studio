@@ -11,7 +11,6 @@ import {
   RefreshCw,
   LogOut,
   Users,
-  ShieldCheck,
   CalendarCheck
 } from 'lucide-react';
 import { 
@@ -28,13 +27,6 @@ interface MemberPortalModalProps {
   onBrowseClasses: () => void;
   onBookingCancelled?: () => void;
 }
-
-const DEMO_MEMBERS = [
-  { name: 'Rahul Sharma', email: 'rahul@example.com', badge: 'Active (90d)' },
-  { name: 'Sneha Rao', email: 'sneha@example.com', badge: 'Active (60d)' },
-  { name: 'Arjun Nair', email: 'arjun@example.com', badge: 'Expiring (5d)' },
-  { name: 'Amitabh Sen', email: 'amitabh@example.com', badge: 'Expired (-10d)' },
-];
 
 export const MemberPortalModal: React.FC<MemberPortalModalProps> = ({
   isOpen,
@@ -190,54 +182,6 @@ export const MemberPortalModal: React.FC<MemberPortalModalProps> = ({
               <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.9rem', marginBottom: '1.25rem', lineHeight: 1.5 }}>
                 Enter your member email address to view your booked class schedule, track waitlist status, or manage cancellations.
               </p>
-
-              {/* Demo Member Quick Picks */}
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  fontSize: '0.75rem',
-                  color: 'rgba(255, 255, 255, 0.65)',
-                  marginBottom: '0.5rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}>
-                  <ShieldCheck size={13} color="var(--crimson-primary)" />
-                  QUICK SELECT DEMO MEMBER:
-                </label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-                  {DEMO_MEMBERS.map((demo) => (
-                    <button
-                      key={demo.email}
-                      type="button"
-                      onClick={() => {
-                        setEmailInput(demo.email);
-                        loadBookings(demo.email);
-                      }}
-                      style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        color: '#ffffff',
-                        borderRadius: '4px',
-                        padding: '0.35rem 0.65rem',
-                        fontSize: '0.725rem',
-                        cursor: 'pointer',
-                        fontWeight: 600,
-                      }}
-                    >
-                      <span>{demo.name}</span>{' '}
-                      <span style={{
-                        fontSize: '0.65rem',
-                        color: demo.badge.includes('Expired') ? '#f43f5e' : demo.badge.includes('Expiring') ? '#f59e0b' : '#10b981',
-                      }}>
-                        ({demo.badge})
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               <form onSubmit={handleVerifySubmit}>
                 <div style={{ marginBottom: '1.25rem' }}>

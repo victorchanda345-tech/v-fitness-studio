@@ -8,8 +8,7 @@ import {
   Users, 
   CheckCircle2, 
   AlertCircle, 
-  CalendarCheck, 
-  ShieldCheck
+  CalendarCheck
 } from 'lucide-react';
 import { 
   api, 
@@ -27,13 +26,6 @@ interface MemberBookingModalProps {
   onBookingComplete: (booking: MemberSelfServiceBooking) => void;
   onOpenMyBookings: () => void;
 }
-
-const DEMO_MEMBERS = [
-  { name: 'Rahul Sharma', email: 'rahul@example.com', badge: 'Active (90d)' },
-  { name: 'Sneha Rao', email: 'sneha@example.com', badge: 'Active (60d)' },
-  { name: 'Arjun Nair', email: 'arjun@example.com', badge: 'Expiring (5d)' },
-  { name: 'Amitabh Sen', email: 'amitabh@example.com', badge: 'Expired (-10d)' },
-];
 
 export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
   isOpen,
@@ -70,12 +62,6 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
   }, [isOpen, session, currentMember]);
 
   if (!isOpen || !session) return null;
-
-  const handleSelectDemo = (demo: typeof DEMO_MEMBERS[0]) => {
-    setEmail(demo.email);
-    setName(demo.name);
-    setError(null);
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -338,59 +324,6 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
           ) : (
             /* Booking Form */
             <form onSubmit={handleSubmit}>
-
-              {/* Demo Member Quick Select */}
-              <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.35rem',
-                  fontSize: '0.75rem',
-                  color: 'rgba(255, 255, 255, 0.65)',
-                  marginBottom: '0.5rem',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.05em',
-                }}>
-                  <ShieldCheck size={13} color="var(--crimson-primary)" />
-                  QUICK SELECT ACTIVE MEMBER (OR TYPE CUSTOM):
-                </label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-                  {DEMO_MEMBERS.map((demo) => {
-                    const isSelected = email.toLowerCase() === demo.email.toLowerCase();
-                    return (
-                      <button
-                        key={demo.email}
-                        type="button"
-                        onClick={() => handleSelectDemo(demo)}
-                        style={{
-                          backgroundColor: isSelected ? 'rgba(229, 36, 36, 0.2)' : 'rgba(255, 255, 255, 0.04)',
-                          border: isSelected ? '1px solid var(--crimson-primary)' : '1px solid rgba(255, 255, 255, 0.1)',
-                          color: isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.8)',
-                          borderRadius: '4px',
-                          padding: '0.35rem 0.65rem',
-                          fontSize: '0.725rem',
-                          cursor: 'pointer',
-                          fontWeight: 600,
-                          transition: 'all 0.15s ease',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.35rem',
-                        }}
-                      >
-                        <span>{demo.name}</span>
-                        <span style={{
-                          fontSize: '0.65rem',
-                          opacity: 0.75,
-                          color: demo.badge.includes('Expired') ? '#f43f5e' : demo.badge.includes('Expiring') ? '#f59e0b' : '#10b981',
-                        }}>
-                          ({demo.badge})
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
 
               {/* Error Message */}
               {error && (
