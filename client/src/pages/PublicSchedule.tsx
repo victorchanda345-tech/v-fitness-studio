@@ -51,7 +51,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       capacity: 15,
       room: 'Studio A',
       primaryInstructor: 'Aarav Mehta',
-      coInstructors: ['Ananya Roy'],
+      coInstructors: ['Ananya Iyer'],
       spotsRemaining: 4,
       isFull: false,
       waitlistedCount: 0,
@@ -83,7 +83,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       capacity: 12,
       room: 'Studio B',
       primaryInstructor: 'Rahul Verma',
-      coInstructors: ['Ananya Roy'],
+      coInstructors: ['Ananya Iyer'],
       spotsRemaining: 1,
       isFull: false,
       waitlistedCount: 0,
@@ -130,7 +130,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       duration: 60,
       capacity: 12,
       room: 'Studio B',
-      primaryInstructor: 'Ananya Roy',
+      primaryInstructor: 'Ananya Iyer',
       coInstructors: ['Aarav Mehta'],
       spotsRemaining: 6,
       isFull: false,
@@ -194,7 +194,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       duration: 60,
       capacity: 15,
       room: 'Studio A',
-      primaryInstructor: 'Ananya Roy',
+      primaryInstructor: 'Ananya Iyer',
       coInstructors: [],
       spotsRemaining: 5,
       isFull: false,
@@ -242,7 +242,7 @@ export const matchesInstructorName = (sessionInstructor: string, filterInstructo
   const sFirst = sLower.split(' ')[0];
   if (fFirst && sFirst && fFirst === sFirst) return true;
 
-  // Cross-system name aliases (e.g. Ananya Roy / Ananya Iyer, Rahul Verma / Rohan Verma)
+  // Cross-system name aliases (e.g. Ananya Iyer, Rahul Verma / Rohan Verma)
   if (fLower.includes('ananya') && sLower.includes('ananya')) return true;
   if (fLower.includes('verma') && sLower.includes('verma')) return true;
   if (fLower.includes('victor') && sLower.includes('victor')) return true;
@@ -295,7 +295,7 @@ export const matchesDiscipline = (sessionDiscipline: string, filterDiscipline: s
 export const COACH_OPTIONS = [
   { id: 'all', label: 'All Coaches' },
   { id: 'Victor Chanda', label: 'Victor Chanda • Head Coach' },
-  { id: 'Ananya Roy', label: 'Ananya Roy • Movement Coach' },
+  { id: 'Ananya Iyer', label: 'Ananya Iyer • Movement Coach' },
   { id: 'Rahul Verma', label: 'Rahul Verma • Pilates Specialist' },
   { id: 'Priya Patel', label: 'Priya Patel • Cardio & Dance Lead' },
   { id: 'Aarav Mehta', label: 'Aarav Mehta • Mobility Coach' },

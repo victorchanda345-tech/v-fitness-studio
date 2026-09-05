@@ -301,7 +301,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
       experience: '10+ yrs coaching competitive athletes & professionals'
     },
     {
-      name: 'Ananya Roy',
+      name: 'Ananya Iyer',
       role: 'Senior Movement Coach',
       specialty: 'Ashtanga Vinyasa, Mobility & Breathwork Mechanics',
       experience: '500-hr RYT certified, international retreat instructor'
