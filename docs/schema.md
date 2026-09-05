@@ -1,114 +1,166 @@
-# Schema Architecture & Trade-offs
+# Database Schema Architecture & Scalability
 
-## 1. Tables, Columns, and Types
+This document details the PostgreSQL relational data model designed for V Fitness Studio via Drizzle ORM, explaining table structures, relational cardinalities, constraint enforcement boundaries, denormalization trade-offs, and horizontal scalability considerations at 100x data scale.
 
-The database schema is defined in `server/src/db/schema.ts` using Drizzle ORM over PostgreSQL:
+---
 
-### `users`
-- `id` (`serial`, PK): Auto-incrementing identifier.
-- `email` (`varchar(255)`, UNIQUE, NOT NULL): User identity / login email.
-- `password_hash` (`varchar(255)`, NOT NULL): bcrypt password hash.
-- `name` (`varchar(255)`, NOT NULL): Display name.
-- `role` (`role` enum: `'staff' | 'instructor'`, NOT NULL): System role.
-- `created_at` (`timestamp`, default now()).
+## 1. Tables, Columns, and Data Types
 
-### `classes`
-- `id` (`serial`, PK): Auto-incrementing identifier.
-- `title` (`varchar(255)`, NOT NULL): Class title (e.g. "Morning Flow Yoga").
-- `description` (`text`): Descriptive text.
-- `discipline` (`varchar(100)`, NOT NULL): Category (Yoga, Pilates, Dance, HIIT, Spin, etc.).
-- `default_duration` (`integer`, NOT NULL): Default duration in minutes.
-- `default_capacity` (`integer`, NOT NULL): Default headcount capacity.
-- `is_archived` (`boolean`, default false, NOT NULL): Soft-archive flag.
-- `created_at` (`timestamp`, default now()).
+The database comprises 7 relational tables defined in `server/src/db/schema.ts`:
 
-### `sessions`
-- `id` (`serial`, PK): Auto-incrementing identifier.
-- `class_id` (`integer`, FK -> `classes.id` ON DELETE CASCADE, NOT NULL): Parent class.
-- `date` (`date`, NOT NULL): Scheduled date (`YYYY-MM-DD`).
-- `start_time` (`varchar(5)`, NOT NULL): Scheduled start (`HH:MM`).
-- `duration` (`integer`, NOT NULL): Effective duration in minutes (defaults from class, overridable).
-- `capacity` (`integer`, NOT NULL): Effective room capacity (defaults from class, overridable).
-- `room` (`varchar(100)`, NOT NULL): Room location (e.g. "Studio A").
-- `primary_instructor_id` (`integer`, FK -> `users.id`, NOT NULL): Primary assigned teacher.
-- `created_at` (`timestamp`, default now()).
+### 1. `users` Table
+Stores authenticated studio staff and instructors.
 
-### `session_co_instructors`
-- `id` (`serial`, PK): Auto-incrementing identifier.
-- `session_id` (`integer`, FK -> `sessions.id` ON DELETE CASCADE, NOT NULL): Associated session.
-- `instructor_id` (`integer`, FK -> `users.id` ON DELETE CASCADE, NOT NULL): Assigned co-instructor.
-- `created_at` (`timestamp`, default now()).
-- *Constraints*: Unique constraint on `(session_id, instructor_id)`.
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `serial` | PRIMARY KEY | Unique auto-incrementing user identifier |
+| `email` | `varchar(255)` | UNIQUE, NOT NULL | Staff / Instructor login email |
+| `password_hash` | `varchar(255)` | NOT NULL | bcrypt hashed password |
+| `name` | `varchar(255)` | NOT NULL | User's full name |
+| `role` | `role` enum | NOT NULL | Enum: `'staff'` or `'instructor'` |
+| `created_at` | `timestamp` | NOT NULL, DEFAULT now() | Account creation timestamp |
 
-### `members`
-- `id` (`serial`, PK): Auto-incrementing identifier.
-- `name` (`varchar(255)`, NOT NULL): Member full name.
-- `email` (`varchar(255)`, UNIQUE, NOT NULL): Member email.
-- `membership_expiry` (`date`, NOT NULL): Expiry date (`YYYY-MM-DD`).
-- `dismissed_alert_expiry` (`varchar(10)`): Expiry date string for which an alert was dismissed (resets upon membership renewal).
-- `created_at` (`timestamp`, default now()).
+### 2. `classes` Table
+Represents studio class offerings (templates for scheduled sessions).
 
-### `bookings`
-- `id` (`serial`, PK): Auto-incrementing identifier.
-- `session_id` (`integer`, FK -> `sessions.id` ON DELETE CASCADE, NOT NULL): Target session.
-- `member_id` (`integer`, FK -> `members.id`, NOT NULL): Attending member.
-- `status` (`booking_status` enum: `'booked' | 'waitlisted' | 'cancelled' | 'attended' | 'no_show'`, NOT NULL): Current lifecycle state.
-- `created_at` (`timestamp`, default now()).
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `serial` | PRIMARY KEY | Unique auto-incrementing class identifier |
+| `title` | `varchar(255)` | NOT NULL | Class title (e.g. "Morning Flow Yoga") |
+| `description` | `text` | NULLABLE | Detailed class overview and workout focus |
+| `discipline` | `varchar(100)` | NOT NULL | Category (e.g. Yoga, Pilates, HIIT, Dance, Spin) |
+| `default_duration` | `integer` | NOT NULL | Default session duration in minutes |
+| `default_capacity` | `integer` | NOT NULL | Default room headcount capacity |
+| `is_archived` | `boolean` | NOT NULL, DEFAULT false | Soft-archive flag (hides from active lists) |
+| `created_at` | `timestamp` | NOT NULL, DEFAULT now() | Class creation timestamp |
 
-### `booking_history`
-- `id` (`serial`, PK): Auto-incrementing identifier.
-- `booking_id` (`integer`, FK -> `bookings.id` ON DELETE CASCADE, NOT NULL): Associated booking.
-- `old_status` (`varchar(20)`): Previous state (`null` on creation).
-- `new_status` (`varchar(20)`, NOT NULL): New state.
-- `changed_by` (`integer`, FK -> `users.id`): Staff or instructor user who initiated transition.
-- `note` (`text`): Staff reason or audit note.
-- `created_at` (`timestamp`, default now()).
+### 3. `sessions` Table
+Specific dated occurrences of a class scheduled in a room with an assigned instructor.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `serial` | PRIMARY KEY | Unique auto-incrementing session identifier |
+| `class_id` | `integer` | NOT NULL, FK -> `classes.id` ON DELETE CASCADE | Parent class reference |
+| `date` | `date` | NOT NULL | Scheduled calendar date (`YYYY-MM-DD`) |
+| `start_time` | `varchar(5)` | NOT NULL | Scheduled start time in 24h format (`HH:MM`) |
+| `duration` | `integer` | NOT NULL | Session duration in minutes (overridable) |
+| `capacity` | `integer` | NOT NULL | Room headcount limit (overridable) |
+| `room` | `varchar(100)` | NOT NULL | Room identifier (e.g. "Studio A", "Studio B") |
+| `primary_instructor_id` | `integer` | NOT NULL, FK -> `users.id` | Assigned lead instructor |
+| `created_at` | `timestamp` | NOT NULL, DEFAULT now() | Session creation timestamp |
+
+### 4. `session_co_instructors` Table
+Associative join table supporting multi-instructor assignments (Goal 5).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `serial` | PRIMARY KEY | Unique auto-incrementing identifier |
+| `session_id` | `integer` | NOT NULL, FK -> `sessions.id` ON DELETE CASCADE | Target session |
+| `instructor_id` | `integer` | NOT NULL, FK -> `users.id` ON DELETE CASCADE | Assigned co-instructor |
+| `created_at` | `timestamp` | NOT NULL, DEFAULT now() | Assignment timestamp |
+| *Composite* | UNIQUE | `UNIQUE(session_id, instructor_id)` | Prevents duplicate co-instructor assignments |
+
+### 5. `members` Table
+Tracks studio members and their membership validity.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `serial` | PRIMARY KEY | Unique auto-incrementing member identifier |
+| `name` | `varchar(255)` | NOT NULL | Member's full name |
+| `email` | `varchar(255)` | UNIQUE, NOT NULL | Member's email address |
+| `membership_expiry` | `date` | NOT NULL | Current membership expiration date |
+| `dismissed_alert_expiry` | `varchar(10)` | NULLABLE | Date string for which an alert was dismissed |
+| `created_at` | `timestamp` | NOT NULL, DEFAULT now() | Member registration timestamp |
+
+### 6. `bookings` Table
+Tracks reservations, waitlists, cancellations, and completed attendances.
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `serial` | PRIMARY KEY | Unique auto-incrementing booking identifier |
+| `session_id` | `integer` | NOT NULL, FK -> `sessions.id` ON DELETE CASCADE | Associated session |
+| `member_id` | `integer` | NOT NULL, FK -> `members.id` | Attending member |
+| `status` | `booking_status` enum | NOT NULL | Enum: `'booked' \| 'waitlisted' \| 'cancelled' \| 'attended' \| 'no_show'` |
+| `created_at` | `timestamp` | NOT NULL, DEFAULT now() | Booking timestamp (used for waitlist ordering) |
+
+### 7. `booking_history` Table
+Immutable audit log recording every booking status transition and staff note (Goal 9).
+
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| `id` | `serial` | PRIMARY KEY | Unique auto-incrementing log identifier |
+| `booking_id` | `integer` | NOT NULL, FK -> `bookings.id` ON DELETE CASCADE | Associated booking |
+| `old_status` | `varchar(20)` | NULLABLE | Previous status (`null` upon initial booking) |
+| `new_status` | `varchar(20)` | NOT NULL | Target status after transition |
+| `changed_by` | `integer` | NULLABLE, FK -> `users.id` | User who initiated transition (`null` if system auto-promoted) |
+| `note` | `text` | NULLABLE | Staff explanation or system audit note |
+| `created_at` | `timestamp` | NOT NULL, DEFAULT now() | Timestamp when transition occurred |
 
 ---
 
 ## 2. Relationships: One-to-Many vs Many-to-Many
 
-- **One-to-Many:**
-  - `classes` (1) ➔ `sessions` (N): A class acts as a template for recurring or scheduled sessions.
-  - `sessions` (1) ➔ `bookings` (N): A session holds bookings up to its capacity plus waitlist.
-  - `members` (1) ➔ `bookings` (N): A member can book multiple sessions over time.
-  - `bookings` (1) ➔ `booking_history` (N): Every status transition creates an immutable log row.
-  - `users` (1) ➔ `sessions` (N): A primary instructor is assigned to multiple sessions.
-- **Many-to-Many (Represented or Emergent):**
-  - `members` ↔ `sessions` via `bookings`: An explicit join table with lifecycle state and timestamps.
-  - Co-instructors ↔ `sessions` (Goal 5): Multiple instructors per session via a join table or co-instructor mapping.
+### One-to-Many (1:N)
+- `classes` (1) ➔ `sessions` (N): One class serves as the template for numerous recurring sessions over time.
+- `sessions` (1) ➔ `bookings` (N): A session holds multiple bookings up to capacity plus waitlists.
+- `members` (1) ➔ `bookings` (N): A member creates multiple bookings across different sessions.
+- `bookings` (1) ➔ `booking_history` (N): Every status transition generates an immutable history record.
+- `users` (1) ➔ `sessions` (N): A primary instructor is assigned to lead multiple sessions.
+- `users` (1) ➔ `booking_history` (N): A staff member or instructor can initiate multiple booking status transitions.
+
+### Many-to-Many (M:N)
+- `members` ↔ `sessions` (via `bookings`): A member can attend multiple sessions, and a session hosts multiple members. Modeled via the `bookings` table with an explicit lifecycle status enum.
+- `instructors` ↔ `sessions` (via `session_co_instructors`): An instructor can assist with multiple sessions, and a session can have multiple co-instructors alongside the lead instructor. Modeled via `session_co_instructors` with a `UNIQUE(session_id, instructor_id)` constraint.
 
 ---
 
-## 3. Database Constraints vs Application Enforced Constraints
+## 3. Database Constraints vs Application-Level Constraints
 
-### Enforced by the Database:
-- **Relational integrity**: Foreign keys on all parent-child links (`session_id`, `class_id`, `member_id`, `booking_id`, `changed_by`).
-- **Cascade deletions**: Deleting a session cascades to delete its bookings and booking history rows, ensuring no orphaned booking records.
-- **Uniqueness**: Unique constraints on `users.email` and `members.email` prevent duplicate accounts at the storage level.
-- **Enum safety**: PostgreSQL enum types (`role`, `booking_status`) guarantee that invalid strings cannot be written.
-
-### Enforced by Application Code:
-- **Membership validity check**: Before booking, verifying `member.membershipExpiry >= today`. We enforce this in application code because membership expiry is a dynamic date check relative to the transaction time.
-- **Capacity & waitlist promotion logic**: Auto-allocating `booked` vs `waitlisted` based on active count vs `session.capacity`, and auto-promoting the earliest waitlist member upon cancellation. This multi-step state transition requires atomic transactional ordering.
-- **Settlement time constraint**: Settle actions (`attended` or `no_show`) are rejected if the session's end time (`date + startTime + duration`) has not passed.
-- **Role-based visibility**: Instructors are restricted at query time to only view their assigned sessions.
-
----
-
-## 4. Deliberate Denormalization
-
-- **Duration and Capacity copied to `sessions`**: Rather than solely referencing `classes.defaultDuration` and `classes.defaultCapacity`, each session stores its own `duration` and `capacity`.
-  - *Rationale*: A class's default capacity may change in the future (e.g. studio changes default capacity from 12 to 15), but past and scheduled sessions must retain their original contracted room capacities. Furthermore, individual sessions may take place in smaller rooms (e.g. Studio C capacity 2).
-- **`old_status` and `new_status` as text in `booking_history`**: Captured explicitly per transition to maintain an audit trail even if enum definitions evolve.
+| Rule / Constraint | Enforced By | Implementation Mechanism & Rationale |
+|-------------------|-------------|--------------------------------------|
+| **Relational Integrity** | Database | Foreign keys on all parent-child relationships with `ON DELETE CASCADE`. |
+| **Email Uniqueness** | Database | `UNIQUE` constraints on `users.email` and `members.email` prevent duplicate accounts at the storage level. |
+| **Enum Value Safety** | Database | Native PostgreSQL enums (`role`, `booking_status`) guarantee invalid string values cannot be inserted. |
+| **Co-Instructor Uniqueness** | Database | `UNIQUE(session_id, instructor_id)` prevents assigning the same instructor twice to a single session. |
+| **Membership Validity** | Application | Evaluated dynamically: `member.membershipExpiry >= today`. Enforced in application logic because expiration is a temporal check relative to the transaction timestamp. |
+| **Capacity & Waitlist Allocation** | Application | Count of active `booked` records is evaluated against `session.capacity`. If count `< capacity`, status is `booked`; otherwise queued as `waitlisted`. |
+| **Waitlist Auto-Promotion** | Application | When a `booked` reservation is cancelled, the server queries `WHERE session_id = ? AND status = 'waitlisted' ORDER BY created_at ASC LIMIT 1` and promotes that booking within the transaction. |
+| **Attendance Settlement Timing** | Application | Settle transitions (`attended`, `no_show`) are rejected unless the scheduled session end time (`date + startTime + duration`) has elapsed. |
+| **Role-Based Visibility** | Application | Instructors are restricted at query time to only view sessions where they are the primary instructor or an assigned co-instructor. |
 
 ---
 
-## 5. What Would Break First at 100x Data?
+## 4. Deliberate Denormalization & Architectural Trade-offs
 
-1. **Race conditions during concurrent bookings on popular classes**:
-   - Currently, the count of active bookings is computed via `select count(*) where status = 'booked'`, followed by an `insert`. If 10 members book the last open spot at the exact same millisecond, multiple transactions could read `count < capacity` simultaneously.
-   - *Fix at scale*: Use a PostgreSQL row-level lock (`SELECT ... FOR UPDATE` on the session row) or an atomic reservation counter with an optimistic concurrency check.
-2. **Unindexed search over `bookings` and `members`**:
-   - At 100x data (~100,000 bookings), text search on `member.name` and `member.email` without a trigram GIN index (`pg_trgm`) will degrade from milliseconds to sequential scans.
-   - *Fix at scale*: Add B-tree indexes on `(session_id, status)`, `(date, start_time)`, and GIN index for search.
+1. **Duration & Capacity Copied from `classes` to `sessions`**:
+   - *Design*: `sessions` explicitly persists `duration` and `capacity` columns rather than reading solely from parent `classes`.
+   - *Rationale*: A class's default capacity may be modified in the future (e.g. increasing default capacity from 10 to 12). Existing scheduled sessions and historical records must preserve their contracted room capacity and duration. Furthermore, individual sessions scheduled in different rooms (e.g. Studio C vs Studio A) require specific capacity overrides.
+2. **Text Representation in `booking_history` (`old_status` and `new_status`)**:
+   - *Design*: Stored as `varchar(20)` rather than linking directly to the PostgreSQL enum type.
+   - *Rationale*: Allows historical audit records to remain immutable and readable even if enum types are altered or expanded in future migrations.
+3. **`dismissed_alert_expiry` Stored Directly on `members`**:
+   - *Design*: Storing the dismissed date string directly on the member record rather than in a separate dismissal log table.
+   - *Rationale*: Avoids an extra table join during high-frequency alert queries. When a staff member updates a member's expiry date, resetting this column automatically causes alerts to resurface for the new cycle without requiring background sync jobs.
+
+---
+
+## 5. Scalability Analysis: What Breaks First at 100x Data?
+
+At 100x data scale (~10,000 classes, ~100,000 sessions, ~1,000,000 bookings):
+
+### 1. Concurrent Booking Race Conditions (Immediate Bottleneck)
+- **Vulnerability**: Currently, capacity verification performs a `SELECT count(*)` followed by an `INSERT`. Under heavy concurrency (e.g., 50 members attempting to reserve the last open spot on a popular class simultaneously), multiple concurrent transactions could read `count < capacity` and oversubscribe the room.
+- **Solution at Scale**:
+  - Implement PostgreSQL row-level locking (`SELECT id FROM sessions WHERE id = ? FOR UPDATE`).
+  - Or maintain an atomic integer column `active_bookings_count` on `sessions` updated via `UPDATE sessions SET active_bookings_count = active_bookings_count + 1 WHERE id = ? AND active_bookings_count < capacity`.
+
+### 2. Unindexed Search & Full Table Scans
+- **Vulnerability**: Server-side text search on `member.name` and `member.email` (`ILIKE '%query%'`) will degrade from milliseconds to sequential disk scans over 1,000,000 rows.
+- **Solution at Scale**:
+  - Add trigram GIN indexes (`CREATE INDEX members_search_gin ON members USING gin (name gin_trgm_ops, email gin_trgm_ops);`).
+  - Add composite B-tree indexes: `CREATE INDEX idx_bookings_session_status ON bookings(session_id, status);` and `CREATE INDEX idx_sessions_date_time ON sessions(date, start_time);`.
+
+### 3. Historical 8-Week Trend Aggregation Overhead
+- **Vulnerability**: Running 8 separate date-range joins on every dashboard load across millions of booking rows will strain database CPU and increase response latency.
+- **Solution at Scale**:
+  - Create a PostgreSQL Materialized View (`weekly_attendance_summary`) refreshed hourly, or an automated daily rollup table storing pre-computed attendance metrics per class and week.
