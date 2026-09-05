@@ -49,7 +49,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '07:30',
       duration: 60,
       capacity: 15,
-      room: 'Studio A (Main Movement Hall)',
+      room: 'Studio A',
       primaryInstructor: 'Aarav Mehta',
       coInstructors: ['Ananya Roy'],
       spotsRemaining: 4,
@@ -65,7 +65,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '10:00',
       duration: 45,
       capacity: 10,
-      room: 'Studio C (HIIT & Functional Rig)',
+      room: 'Studio C',
       primaryInstructor: 'Victor Chanda',
       coInstructors: ['Rahul Verma'],
       spotsRemaining: 2,
@@ -81,7 +81,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '18:00',
       duration: 50,
       capacity: 12,
-      room: 'Studio B (Mind & Core Studio)',
+      room: 'Studio B',
       primaryInstructor: 'Rahul Verma',
       coInstructors: ['Ananya Roy'],
       spotsRemaining: 1,
@@ -97,7 +97,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '09:00',
       duration: 60,
       capacity: 15,
-      room: 'Studio A (Main Movement Hall)',
+      room: 'Studio A',
       primaryInstructor: 'Priya Patel',
       coInstructors: ['Aarav Mehta'],
       spotsRemaining: 8,
@@ -113,7 +113,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '17:30',
       duration: 45,
       capacity: 10,
-      room: 'Studio C (HIIT & Functional Rig)',
+      room: 'Studio C',
       primaryInstructor: 'Victor Chanda',
       coInstructors: [],
       spotsRemaining: 5,
@@ -129,7 +129,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '08:00',
       duration: 60,
       capacity: 12,
-      room: 'Studio B (Mind & Core Studio)',
+      room: 'Studio B',
       primaryInstructor: 'Ananya Roy',
       coInstructors: ['Aarav Mehta'],
       spotsRemaining: 6,
@@ -145,7 +145,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '18:30',
       duration: 45,
       capacity: 10,
-      room: 'Studio C (HIIT & Functional Rig)',
+      room: 'Studio C',
       primaryInstructor: 'Victor Chanda',
       coInstructors: ['Rahul Verma'],
       spotsRemaining: 3,
@@ -161,7 +161,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '17:00',
       duration: 50,
       capacity: 15,
-      room: 'Studio A (Main Movement Hall)',
+      room: 'Studio A',
       primaryInstructor: 'Priya Patel',
       coInstructors: [],
       spotsRemaining: 7,
@@ -177,7 +177,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '11:00',
       duration: 50,
       capacity: 12,
-      room: 'Studio B (Mind & Core Studio)',
+      room: 'Studio B',
       primaryInstructor: 'Rahul Verma',
       coInstructors: [],
       spotsRemaining: 4,
@@ -193,7 +193,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '07:00',
       duration: 60,
       capacity: 15,
-      room: 'Studio A (Main Movement Hall)',
+      room: 'Studio A',
       primaryInstructor: 'Ananya Roy',
       coInstructors: [],
       spotsRemaining: 5,
@@ -586,9 +586,9 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
               All Studios (Show All)
             </button>
             {[
-              { id: 'Studio A', label: 'Studio A • Main Movement Hall' },
-              { id: 'Studio B', label: 'Studio B • Mind & Core' },
-              { id: 'Studio C', label: 'Studio C • HIIT & Rig' },
+              { id: 'Studio A', label: 'Studio A' },
+              { id: 'Studio B', label: 'Studio B' },
+              { id: 'Studio C', label: 'Studio C' },
             ].map((st) => {
               const isActive = normalizeRoom(selectedRoom) === st.id;
               return (
@@ -766,10 +766,7 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
             </div>
             <div>
               <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ffffff' }}>
-                Filtering Exclusively for {selectedRoom.toUpperCase()}
-                <span style={{ color: 'var(--crimson-primary)', fontWeight: 600, marginLeft: '0.4rem' }}>
-                  {normalizeRoom(selectedRoom) === 'Studio A' ? '• Main Movement Hall' : normalizeRoom(selectedRoom) === 'Studio B' ? '• Mind & Core Studio' : '• HIIT & Functional Rig'}
-                </span>
+                Filtering Exclusively for {normalizeRoom(selectedRoom).toUpperCase()}
               </div>
               <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)' }}>
                 {filteredSessions.length === 0 ? 'No sessions found for this studio with current filters' : `Showing only sessions scheduled in ${selectedRoom} (${filteredSessions.length} total)`}

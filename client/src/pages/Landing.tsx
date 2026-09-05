@@ -98,7 +98,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
       title: '5 Principles Every Athlete Must Master for Peak Strength',
       description: 'Mastering progressive overload, bar path acceleration, and compound movement mechanics under tension.',
       image: '/images/photo-strength.jpg',
-      room: 'Studio C • Functional Rig',
+      room: 'Studio C',
       readTime: '4 MIN READ',
       author: 'Victor Chanda',
       authorRole: 'Head Strength Coach & Studio Founder',
@@ -149,7 +149,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
         'Protect joint capsules by establishing external rotational torque at the hips and shoulders before lifting.',
         'Treat 8 hours of restorative sleep as an equally critical training variable as your heaviest set.'
       ],
-      relatedClassTitle: 'HIIT & STRENGTH • Studio C',
+      relatedClassTitle: 'HIIT & STRENGTH',
       relatedClassCta: 'VIEW STRENGTH SESSIONS'
     },
     {
@@ -223,7 +223,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
       title: 'How to Stay Relentlessly Consistent When Motivation Runs Out',
       description: 'Building unbreakable training systems, habit loops, and mental resilience when physical fatigue sets in.',
       image: '/images/photo-mindset.jpg',
-      room: 'Studio B • Mind & Core',
+      room: 'Studio B',
       readTime: '4 MIN READ',
       author: 'Aarav Mehta',
       authorRole: 'Athletic Mindset & Mobility Coach',
@@ -267,7 +267,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
         'Leverage the community cohort effect: training alongside peers increases long-term adherence by 84%.',
         'Shift your mindset from "I have to exercise" to "I am an athlete who respects my body."'
       ],
-      relatedClassTitle: 'YOGA & MOBILITY • Studio B',
+      relatedClassTitle: 'YOGA & MOBILITY',
       relatedClassCta: 'VIEW MOBILITY SESSIONS'
     }
   ];
