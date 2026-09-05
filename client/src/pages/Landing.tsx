@@ -660,16 +660,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
             </h2>
           </div>
 
-          <div style={{ maxWidth: '440px', textAlign: 'right' }}>
-            <p style={{
-              color: 'rgba(255, 255, 255, 0.65)',
-              fontSize: '0.95rem',
-              lineHeight: 1.5,
-              marginBottom: '1rem',
-              textAlign: 'left'
-            }}>
-              Every class is engineered with one goal in mind — getting you the physical and mental adaptation you came for. No fluff, no filler.
-            </p>
+          <div>
             <button 
               onClick={openAllTimetable}
               className="btn-crimson"
