@@ -281,7 +281,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
         
         {/* Giant Background Watermark Text */}
         <div className="hero-watermark">
-          VICTOR CHANDA
+          V FITNESS STUDIO
         </div>
 
         <div style={{

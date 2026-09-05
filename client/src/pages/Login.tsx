@@ -59,7 +59,7 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
         whiteSpace: 'nowrap',
         userSelect: 'none'
       }}>
-        VICTOR CHANDA
+        V FITNESS STUDIO
       </div>
 
       <div 
