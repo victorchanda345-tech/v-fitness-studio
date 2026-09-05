@@ -16,6 +16,7 @@ interface PublicScheduleProps {
   onSignInClick?: () => void;
   onBackToApp?: () => void;
   onBackToHome?: () => void;
+  initialRoom?: string;
 }
 
 const formatYMD = (d: Date) => {
@@ -42,7 +43,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       startTime: '07:30',
       duration: 60,
       capacity: 15,
-      room: 'Studio A (Zen)',
+      room: 'Studio A (Main Movement Hall)',
       primaryInstructor: 'Aarav Mehta',
       coInstructors: ['Ananya Iyer'],
       spotsRemaining: 4,
@@ -51,14 +52,14 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
     },
     {
       id: 102,
-      classTitle: 'HIIT Blast',
+      classTitle: 'HIIT & Strength Blast',
       description: 'High-intensity interval conditioning combining plyometrics, kettlebell circuits, and sprint intervals.',
       discipline: 'Cardio',
       date: d0,
       startTime: '10:00',
       duration: 45,
-      capacity: 12,
-      room: 'Studio B (Iron)',
+      capacity: 10,
+      room: 'Studio C (HIIT & Functional Rig)',
       primaryInstructor: 'Victor Chanda',
       coInstructors: ['Rohan Verma'],
       spotsRemaining: 2,
@@ -67,14 +68,14 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
     },
     {
       id: 103,
-      classTitle: 'Core Pilates',
+      classTitle: 'Core Pilates & Posture',
       description: 'Precision matwork targeting deep stabilizing core musculature, pelvic alignment, and spinal flexibility.',
       discipline: 'Pilates',
       date: d0,
       startTime: '18:00',
       duration: 50,
-      capacity: 10,
-      room: 'Studio A (Zen)',
+      capacity: 12,
+      room: 'Studio B (Mind & Core Studio)',
       primaryInstructor: 'Ananya Iyer',
       coInstructors: [],
       spotsRemaining: 1,
@@ -89,8 +90,8 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
       date: d1,
       startTime: '09:00',
       duration: 60,
-      capacity: 20,
-      room: 'Main Studio Hall',
+      capacity: 15,
+      room: 'Studio A (Main Movement Hall)',
       primaryInstructor: 'Rohan Verma',
       coInstructors: ['Aarav Mehta'],
       spotsRemaining: 8,
@@ -99,14 +100,14 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
     },
     {
       id: 105,
-      classTitle: 'Spin & Sweat',
-      description: 'Rhythm-based indoor cycling engineered for endurance, hill climbs, cadence pushes, and sprint bursts.',
-      discipline: 'Cycling',
+      classTitle: 'Functional Rig & Kettlebells',
+      description: 'Rogue power rack work, assault bike sprints, Concept2 rowing intervals, and turf carries.',
+      discipline: 'Cardio',
       date: d1,
       startTime: '17:30',
       duration: 45,
-      capacity: 14,
-      room: 'Spin Arena',
+      capacity: 10,
+      room: 'Studio C (HIIT & Functional Rig)',
       primaryInstructor: 'Victor Chanda',
       coInstructors: [],
       spotsRemaining: 5,
@@ -115,14 +116,14 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
     },
     {
       id: 106,
-      classTitle: 'Morning Flow Yoga',
+      classTitle: 'Restorative Vinyasa & Mobility',
       description: 'Awaken your mind and body with dynamic vinyasa flow sequencing, mobility drills, and restorative breathwork.',
       discipline: 'Yoga',
       date: d2,
       startTime: '08:00',
       duration: 60,
-      capacity: 15,
-      room: 'Studio A (Zen)',
+      capacity: 12,
+      room: 'Studio B (Mind & Core Studio)',
       primaryInstructor: 'Aarav Mehta',
       coInstructors: [],
       spotsRemaining: 6,
@@ -131,14 +132,14 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
     },
     {
       id: 107,
-      classTitle: 'HIIT Blast',
+      classTitle: 'Athletic Conditioning Circuits',
       description: 'High-intensity interval conditioning combining plyometrics, kettlebell circuits, and sprint intervals.',
       discipline: 'Cardio',
       date: d3,
       startTime: '18:30',
       duration: 45,
-      capacity: 12,
-      room: 'Studio B (Iron)',
+      capacity: 10,
+      room: 'Studio C (HIIT & Functional Rig)',
       primaryInstructor: 'Victor Chanda',
       coInstructors: ['Rohan Verma'],
       spotsRemaining: 3,
@@ -149,7 +150,7 @@ const getFallbackSchedule = (): { sessions: PublicSessionItem[]; disciplines: st
 
   return {
     sessions: fallbackSessions,
-    disciplines: ['Cardio', 'Cycling', 'Dance', 'Pilates', 'Yoga'],
+    disciplines: ['Cardio', 'Dance', 'Pilates', 'Yoga'],
   };
 };
 
@@ -166,10 +167,19 @@ const getCachedSchedule = (): { sessions: PublicSessionItem[]; disciplines: stri
   return getFallbackSchedule();
 };
 
+export const normalizeRoom = (roomStr: string) => {
+  const lower = (roomStr || '').toLowerCase();
+  if (lower.includes('studio a') || lower.includes('main movement') || lower.includes('movement hall') || lower.includes('main studio')) return 'Studio A';
+  if (lower.includes('studio b') || lower.includes('mind & core') || lower.includes('mind and core')) return 'Studio B';
+  if (lower.includes('studio c') || lower.includes('functional rig') || lower.includes('hiit & functional') || lower.includes('spin arena')) return 'Studio C';
+  return roomStr;
+};
+
 export const PublicSchedule: React.FC<PublicScheduleProps> = ({ 
   onSignInClick, 
   onBackToApp,
-  onBackToHome 
+  onBackToHome,
+  initialRoom = 'all'
 }) => {
   const { user } = useAuth();
   const initialData = getCachedSchedule();
@@ -181,7 +191,15 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
 
   // Filters
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
+  const [selectedRoom, setSelectedRoom] = useState<string>(initialRoom);
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('');
+
+  // Keep selectedRoom in sync if initialRoom changes
+  useEffect(() => {
+    if (initialRoom) {
+      setSelectedRoom(initialRoom);
+    }
+  }, [initialRoom]);
 
   useEffect(() => {
     let isMounted = true;
@@ -219,7 +237,15 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
     const matchesDiscipline =
       selectedDiscipline === 'all' || s.discipline.toLowerCase() === selectedDiscipline.toLowerCase();
     const matchesDate = !selectedDateFilter || s.date === selectedDateFilter;
-    return matchesDiscipline && matchesDate;
+    
+    const sessionRoomNorm = normalizeRoom(s.room);
+    const selectedRoomNorm = normalizeRoom(selectedRoom);
+    const matchesRoom =
+      selectedRoom === 'all' ||
+      sessionRoomNorm.toLowerCase() === selectedRoomNorm.toLowerCase() ||
+      s.room.toLowerCase().includes(selectedRoom.toLowerCase());
+
+    return matchesDiscipline && matchesDate && matchesRoom;
   });
 
   // Group by date for readable agenda view
@@ -315,53 +341,146 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
       )}
 
       {/* Filter and Date Bar */}
-      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', marginBottom: '2.5rem' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.25rem' }}>
+      <div className="glass-panel" style={{ padding: '1.25rem 1.5rem', marginBottom: '1.75rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           
-          {/* Discipline Pills */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, marginRight: '0.25rem' }}>
-              DISCIPLINE:
+          {/* Row 1: Studio Room Selector */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, minWidth: '95px', letterSpacing: '0.04em' }}>
+              STUDIO ROOM:
             </span>
             <button
-              onClick={() => setSelectedDiscipline('all')}
-              className={`btn ${selectedDiscipline === 'all' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-              style={{ borderRadius: '20px', padding: '0.35rem 0.85rem' }}
+              type="button"
+              onClick={() => setSelectedRoom('all')}
+              className={`btn ${selectedRoom === 'all' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+              style={{ borderRadius: '20px', padding: '0.35rem 0.95rem', fontSize: '0.78rem' }}
             >
-              All Disciplines
+              All Studios (Show All)
             </button>
-            {disciplines.map((d) => (
-              <button
-                key={d}
-                onClick={() => setSelectedDiscipline(d)}
-                className={`btn ${selectedDiscipline.toLowerCase() === d.toLowerCase() ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-                style={{ borderRadius: '20px', padding: '0.35rem 0.85rem' }}
-              >
-                {d}
-              </button>
-            ))}
+            {[
+              { id: 'Studio A', label: 'Studio A • Main Movement Hall' },
+              { id: 'Studio B', label: 'Studio B • Mind & Core' },
+              { id: 'Studio C', label: 'Studio C • HIIT & Rig' },
+            ].map((st) => {
+              const isActive = normalizeRoom(selectedRoom) === st.id;
+              return (
+                <button
+                  key={st.id}
+                  type="button"
+                  onClick={() => setSelectedRoom(st.id)}
+                  className={`btn ${isActive ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  style={{ borderRadius: '20px', padding: '0.35rem 0.95rem', fontSize: '0.78rem' }}
+                >
+                  {st.label}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Date Picker Filter */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <label htmlFor="publicDateFilter" style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'none' }}>
-              Filter Date:
-            </label>
-            <input
-              id="publicDateFilter"
-              type="date"
-              value={selectedDateFilter}
-              onChange={(e) => setSelectedDateFilter(e.target.value)}
-              style={{ width: 'auto', padding: '0.4rem 0.6rem', fontSize: '0.85rem' }}
-            />
-            {selectedDateFilter && (
-              <button onClick={() => setSelectedDateFilter('')} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.6rem' }}>
-                Clear
+          <div style={{ height: '1px', backgroundColor: 'var(--border-subtle)' }} />
+
+          {/* Row 2: Discipline & Date Filter */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1.25rem' }}>
+            
+            {/* Discipline Pills */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, minWidth: '95px', letterSpacing: '0.04em' }}>
+                DISCIPLINE:
+              </span>
+              <button
+                type="button"
+                onClick={() => setSelectedDiscipline('all')}
+                className={`btn ${selectedDiscipline === 'all' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                style={{ borderRadius: '20px', padding: '0.35rem 0.85rem', fontSize: '0.78rem' }}
+              >
+                All Disciplines
               </button>
-            )}
+              {disciplines.map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => setSelectedDiscipline(d)}
+                  className={`btn ${selectedDiscipline.toLowerCase() === d.toLowerCase() ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  style={{ borderRadius: '20px', padding: '0.35rem 0.85rem', fontSize: '0.78rem' }}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
+
+            {/* Date Picker Filter */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <label htmlFor="publicDateFilter" style={{ margin: 0, fontSize: '0.8rem', color: 'var(--text-muted)', textTransform: 'none' }}>
+                Filter Date:
+              </label>
+              <input
+                id="publicDateFilter"
+                type="date"
+                value={selectedDateFilter}
+                onChange={(e) => setSelectedDateFilter(e.target.value)}
+                style={{ width: 'auto', padding: '0.4rem 0.6rem', fontSize: '0.85rem' }}
+              />
+              {selectedDateFilter && (
+                <button onClick={() => setSelectedDateFilter('')} className="btn btn-secondary btn-sm" style={{ padding: '0.4rem 0.6rem' }}>
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
+
         </div>
       </div>
+
+      {/* Active Studio Room Indicator Banner */}
+      {selectedRoom !== 'all' && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0.85rem 1.25rem',
+          borderRadius: '6px',
+          backgroundColor: 'rgba(229, 36, 36, 0.08)',
+          border: '1px solid rgba(229, 36, 36, 0.3)',
+          marginBottom: '2rem',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '4px',
+              backgroundColor: 'var(--crimson-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff'
+            }}>
+              <MapPin size={15} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ffffff' }}>
+                Filtering Exclusively for {selectedRoom.toUpperCase()}
+                <span style={{ color: 'var(--crimson-primary)', fontWeight: 600, marginLeft: '0.4rem' }}>
+                  {normalizeRoom(selectedRoom) === 'Studio A' ? '• Main Movement Hall' : normalizeRoom(selectedRoom) === 'Studio B' ? '• Mind & Core Studio' : '• HIIT & Functional Rig'}
+                </span>
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)' }}>
+                {filteredSessions.length === 0 ? 'No sessions found for this studio with current filters' : `Showing only sessions scheduled in ${selectedRoom} (${filteredSessions.length} total)`}
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setSelectedRoom('all')}
+            className="btn btn-secondary btn-sm"
+            style={{ fontSize: '0.75rem', padding: '0.35rem 0.85rem' }}
+          >
+            Show All Studios (Reset)
+          </button>
+        </div>
+      )}
 
       {loading && (
         <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
@@ -480,12 +599,18 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
 
       {!loading && sortedDates.length === 0 && (
         <div className="glass-panel" style={{ padding: '4rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-          <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>No sessions found matching your filter.</p>
+          <p style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#ffffff' }}>
+            No sessions found matching {selectedRoom !== 'all' ? selectedRoom : 'the selected filters'}.
+          </p>
+          <p style={{ fontSize: '0.85rem', color: 'rgba(255, 255, 255, 0.5)', marginBottom: '1.25rem' }}>
+            Try resetting your studio room, discipline, or date filter to view upcoming sessions.
+          </p>
           <button 
-            onClick={() => { setSelectedDiscipline('all'); setSelectedDateFilter(''); }} 
-            className="btn btn-secondary btn-sm"
+            type="button"
+            onClick={() => { setSelectedDiscipline('all'); setSelectedDateFilter(''); setSelectedRoom('all'); }} 
+            className="btn btn-primary btn-sm"
           >
-            Reset Filters
+            Reset All Filters (Show All Studios)
           </button>
         </div>
       )}

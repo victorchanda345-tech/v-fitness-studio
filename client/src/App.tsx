@@ -26,6 +26,7 @@ const MainApp: React.FC = () => {
   const [selectedSessionId, setSelectedSessionId] = useState<number | null>(null);
   const [alertsCount, setAlertsCount] = useState<number>(0);
   const [publicView, setPublicView] = useState<PublicView>('landing');
+  const [selectedStudioRoom, setSelectedStudioRoom] = useState<string>('all');
 
   // Pre-warm public timetable in background and wake up server
   useEffect(() => {
@@ -66,8 +67,12 @@ const MainApp: React.FC = () => {
     if (publicView === 'timetable') {
       return (
         <PublicSchedule 
+          initialRoom={selectedStudioRoom}
           onSignInClick={() => setPublicView('login')} 
-          onBackToHome={() => setPublicView('landing')}
+          onBackToHome={() => {
+            setSelectedStudioRoom('all');
+            setPublicView('landing');
+          }}
         />
       );
     }
@@ -75,15 +80,24 @@ const MainApp: React.FC = () => {
     if (publicView === 'login') {
       return (
         <Login 
-          onViewSchedule={() => setPublicView('timetable')} 
-          onBackToHome={() => setPublicView('landing')}
+          onViewSchedule={() => {
+            setSelectedStudioRoom('all');
+            setPublicView('timetable');
+          }} 
+          onBackToHome={() => {
+            setSelectedStudioRoom('all');
+            setPublicView('landing');
+          }}
         />
       );
     }
 
     return (
       <Landing 
-        onOpenTimetable={() => setPublicView('timetable')}
+        onOpenTimetable={(studioRoom?: string) => {
+          setSelectedStudioRoom(studioRoom || 'all');
+          setPublicView('timetable');
+        }}
         onOpenLogin={() => setPublicView('login')}
       />
     );
@@ -168,6 +182,7 @@ const MainApp: React.FC = () => {
         {/* Public Timetable View (Stretch Feature) */}
         {activeTab === 'public-schedule' && (
           <PublicSchedule 
+            initialRoom={selectedStudioRoom}
             onBackToApp={() => setActiveTab('dashboard')} 
           />
         )}

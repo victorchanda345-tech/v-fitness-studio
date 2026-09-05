@@ -8,18 +8,21 @@ import {
   X, 
   Lock,
   Clock,
-  BookOpen
+  BookOpen,
+  Users
 } from 'lucide-react';
 import { ArticleModal, EditorialArticle } from '../components/ArticleModal';
 
 interface LandingProps {
-  onOpenTimetable: () => void;
+  onOpenTimetable: (studioRoom?: string) => void;
   onOpenLogin: () => void;
 }
 
 export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<EditorialArticle | null>(null);
+
+  const openAllTimetable = () => onOpenTimetable();
 
   const programs = [
     {
@@ -250,19 +253,19 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
     {
       name: 'Studio A',
       type: 'Main Movement Hall',
-      capacity: '15 Athletes',
+      capacity: 'CAPACITY: 15 SPOTS',
       specs: 'Shock-absorbing sprung bamboo flooring, 360° surround audio system, full-length mirror wall.'
     },
     {
       name: 'Studio B',
       type: 'Mind & Core Studio',
-      capacity: '12 Athletes',
+      capacity: 'CAPACITY: 12 SPOTS',
       specs: 'Acoustic soundproofing, dimmable amber circadian lighting, eco-cork mats & high-density foam rollers.'
     },
     {
       name: 'Studio C',
       type: 'HIIT & Functional Rig',
-      capacity: '10 Athletes',
+      capacity: 'CAPACITY: 10 SPOTS',
       specs: 'Heavy-duty Rogue power racks, competition kettlebells, Concept2 rowers, assault bikes & turf track.'
     }
   ];
@@ -392,7 +395,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               STAFF PORTAL
             </button>
             <button 
-              onClick={onOpenTimetable}
+              onClick={openAllTimetable}
               className="btn-crimson"
               style={{ padding: '0.65rem 1.35rem', fontSize: '0.8rem' }}
             >
@@ -490,7 +493,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
 
             <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '1.25rem' }}>
               <button 
-                onClick={onOpenTimetable}
+                onClick={openAllTimetable}
                 className="btn-crimson"
                 style={{ padding: '1rem 2.2rem', fontSize: '0.95rem' }}
               >
@@ -633,7 +636,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               Every class is engineered with one goal in mind — getting you the physical and mental adaptation you came for. No fluff, no filler.
             </p>
             <button 
-              onClick={onOpenTimetable}
+              onClick={openAllTimetable}
               className="btn-crimson"
               style={{ fontSize: '0.825rem', padding: '0.65rem 1.25rem' }}
             >
@@ -730,7 +733,8 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                     ALL FITNESS LEVELS
                   </span>
                   <button
-                    onClick={onOpenTimetable}
+                    type="button"
+                    onClick={() => onOpenTimetable(prog.room)}
                     style={{
                       background: 'transparent',
                       border: 'none',
@@ -791,7 +795,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
             </div>
 
             <button 
-              onClick={onOpenTimetable}
+              onClick={openAllTimetable}
               className="btn-athletic-outline"
               style={{ fontSize: '0.8rem', padding: '0.65rem 1.25rem' }}
             >
@@ -961,7 +965,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               padding: '2rem 1.75rem',
               transition: 'border-color 0.2s ease'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                 <span className="font-display" style={{ fontSize: '1.8rem', color: '#ffffff' }}>
                   {st.name}
                 </span>
@@ -969,11 +973,16 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                   backgroundColor: 'rgba(229, 36, 36, 0.15)',
                   color: 'var(--crimson-primary)',
                   border: '1px solid rgba(229, 36, 36, 0.3)',
-                  padding: '0.2rem 0.6rem',
+                  padding: '0.25rem 0.65rem',
                   borderRadius: '3px',
-                  fontSize: '0.725rem',
-                  fontWeight: 700
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  letterSpacing: '0.04em',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.35rem'
                 }}>
+                  <Users size={12} color="var(--crimson-primary)" />
                   {st.capacity}
                 </span>
               </div>
@@ -987,7 +996,8 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               </p>
 
               <button 
-                onClick={onOpenTimetable}
+                type="button"
+                onClick={() => onOpenTimetable(st.name)}
                 style={{
                   background: 'none',
                   border: 'none',
@@ -1000,10 +1010,19 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                   padding: 0,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.4rem'
+                  gap: '0.4rem',
+                  transition: 'color 0.2s ease, transform 0.2s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.color = 'var(--crimson-primary)';
+                  e.currentTarget.style.transform = 'translateX(4px)';
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.color = '#ffffff';
+                  e.currentTarget.style.transform = 'none';
                 }}
               >
-                VIEW STUDIO TIMETABLE →
+                VIEW {st.name.toUpperCase()} TIMETABLE →
               </button>
             </div>
           ))}
@@ -1082,7 +1101,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                 </div>
 
                 <button 
-                  onClick={onOpenTimetable}
+                  onClick={openAllTimetable}
                   style={{
                     background: 'transparent',
                     border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -1201,7 +1220,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               </div>
 
               <button 
-                onClick={onOpenTimetable}
+                onClick={openAllTimetable}
                 className={tier.isFeatured ? 'btn-crimson' : 'btn-athletic-outline'}
                 style={{ width: '100%', justifyContent: 'center' }}
               >
@@ -1299,7 +1318,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               <button 
-                onClick={onOpenTimetable}
+                onClick={openAllTimetable}
                 className="btn-crimson"
                 style={{ width: '100%', justifyContent: 'center', padding: '1rem' }}
               >
@@ -1368,7 +1387,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
               STAFF PORTAL
             </button>
             <button 
-              onClick={onOpenTimetable}
+              onClick={openAllTimetable}
               style={{
                 background: 'none',
                 border: 'none',
@@ -1392,8 +1411,15 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
           article={selectedArticle}
           onClose={() => setSelectedArticle(null)}
           onBookClass={() => {
+            const articleId = selectedArticle.id;
             setSelectedArticle(null);
-            onOpenTimetable();
+            if (articleId === 'biomechanics-lifting') {
+              onOpenTimetable('Studio C');
+            } else if (articleId === 'relentless-consistency') {
+              onOpenTimetable('Studio B');
+            } else {
+              onOpenTimetable();
+            }
           }}
         />
       )}
