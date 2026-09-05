@@ -368,13 +368,26 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
           justifyContent: 'space-between'
         }}>
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span style={{
-              width: '10px',
-              height: '10px',
-              backgroundColor: 'var(--crimson-primary)',
-              display: 'inline-block'
-            }}></span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '34px',
+              height: '34px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, var(--crimson-primary) 0%, #8B1111 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              fontWeight: 900,
+              fontSize: '1.2rem',
+              fontFamily: 'var(--font-display)',
+              boxShadow: '0 4px 14px rgba(229, 36, 36, 0.45)',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              flexShrink: 0,
+              lineHeight: 1
+            }}>
+              V
+            </div>
             <span className="font-display" style={{
               fontSize: '1.5rem',
               fontWeight: 900,
@@ -1398,8 +1411,26 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
           alignItems: 'center',
           gap: '1.5rem'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <span style={{ width: '8px', height: '8px', backgroundColor: 'var(--crimson-primary)', display: 'inline-block' }}></span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '6px',
+              background: 'linear-gradient(135deg, var(--crimson-primary) 0%, #8B1111 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff',
+              fontWeight: 900,
+              fontSize: '1rem',
+              fontFamily: 'var(--font-display)',
+              boxShadow: '0 4px 12px rgba(229, 36, 36, 0.35)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              flexShrink: 0,
+              lineHeight: 1
+            }}>
+              V
+            </div>
             <span className="font-display" style={{ fontSize: '1.25rem', color: '#ffffff', letterSpacing: '0.04em' }}>
               V FITNESS STUDIO
             </span>

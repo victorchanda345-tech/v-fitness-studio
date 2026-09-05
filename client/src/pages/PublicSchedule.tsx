@@ -483,12 +483,33 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
         flexWrap: 'wrap',
         gap: '1rem',
       }}>
-        <div>
-          <div style={{ fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
-            V Fitness Studio
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{
+            width: '34px',
+            height: '34px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, var(--crimson-primary) 0%, #8B1111 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#ffffff',
+            fontWeight: 900,
+            fontSize: '1.2rem',
+            fontFamily: 'var(--font-display)',
+            boxShadow: '0 4px 14px rgba(229, 36, 36, 0.45)',
+            border: '1px solid rgba(255, 255, 255, 0.25)',
+            flexShrink: 0,
+            lineHeight: 1
+          }}>
+            V
           </div>
-          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Public Timetable
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
+              V Fitness Studio
+            </div>
+            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              Public Timetable
+            </div>
           </div>
         </div>
 
