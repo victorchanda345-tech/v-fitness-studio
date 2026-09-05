@@ -10,12 +10,12 @@ Fill this in and commit it. This is the first file we open.
 
 ## Notes for the reviewer
 
-- **Studio**: **V Fitness Studio** — Boutique fitness & studio class booking system.
+- **Studio**: **V Fitness Studio** — Premium boutique fitness studio operations and class booking management platform.
 - **Live Application**: Deployed on Vercel at `https://v-fitness-studio.vercel.app`.
-- **Backend API**: Live on Render at `https://v-fitness-studio.onrender.com`. Healthcheck available at `https://v-fitness-studio.onrender.com/api/health`.
-- **Note on Free-Tier Sleeping**: The backend is hosted on Render's free tier. Free tier instances automatically spin down/sleep when idle and can take 30–60 seconds to wake up on the first request. Subsequent requests are fast.
-- **Database**: PostgreSQL hosted on Supabase with Drizzle ORM. Strict relational foreign keys with `CASCADE` deletes, uniqueness constraints on co-instructors `(session_id, instructor_id)`, and immutable audit log tables.
-- **Frontend**: React 18 + Vite with TypeScript running on Vercel edge network with SPA rewrites.
+- **Backend API**: Deployed on Render at `https://v-fitness-studio.onrender.com`. Health check endpoint verified at `https://v-fitness-studio.onrender.com/api/health`.
+- **Note on Free-Tier Spin-Up**: The backend is hosted on Render's free tier. Idle instances automatically spin down and require 30–60 seconds to initialize upon the initial request. Subsequent requests execute with low-latency response times.
+- **Database**: PostgreSQL hosted on Supabase with Drizzle ORM. Configured with strict relational foreign keys, `CASCADE` deletions, uniqueness constraints on co-instructor assignments `(session_id, instructor_id)`, and immutable audit log tables.
+- **Frontend**: React 18 with TypeScript and Vite, served via Vercel's global edge network with single-page application (SPA) rewrites.
 - **Production Build**: Verified with `npm run build` in `client/` (0 errors, 0 warnings).
 
 ## Demo credentials
@@ -30,12 +30,12 @@ Fill this in and commit it. This is the first file we open.
 
 ## Stack
 
-| Layer | What you used | Why |
-|-------|---------------|-----|
-| Frontend | React 18 + Vite (TypeScript) + Vanilla CSS Glassmorphism | Fast bundling, reactive component tree, type-safe API client, modern dark-mode responsive aesthetics |
-| Backend | Node.js + Express 5 (TypeScript) | Lightweight, flexible middleware pipeline with stateless JWT auth, role-based authorization |
-| Database | PostgreSQL (Supabase) + Drizzle ORM | Native SQL relational modeling, strict FK cascades, zero runtime ORM overhead, full type safety |
-| Hosting | Vercel (Frontend SPA) + Render (Node.js API) + Supabase (PostgreSQL DB) | Zero-cost modern serverless architecture with global CDN caching and managed PostgreSQL |
+| Layer | Technology | Architectural Rationale |
+|-------|------------|-------------------------|
+| Frontend | React 18 + Vite (TypeScript) + Vanilla CSS Glassmorphism | Fast compilation, reactive component architecture, type-safe API client, and custom dark carbon & crimson design system |
+| Backend | Node.js + Express 5 (TypeScript) | Lightweight, modular middleware pipeline with stateless JWT authentication and role-based authorization |
+| Database | PostgreSQL (Supabase) + Drizzle ORM | Native SQL relational schema, strict foreign key constraints, zero runtime ORM overhead, and full TypeScript type safety |
+| Hosting | Vercel (Frontend SPA) + Render (Node.js API) + Supabase (Managed PostgreSQL) | Modern cloud architecture with global edge CDN caching and scalable managed database infrastructure |
 
 ## Goal checklist
 
@@ -43,41 +43,41 @@ Mark each honestly. Partial is fine — say what is partial.
 
 | # | Goal | Status | Notes |
 |---|------|--------|-------|
-| 1 | Accounts and roles | Done | Staff & instructor roles enforced on server via JWT middleware; staff can assign primary & co-instructors; instructors can view assigned roster and settle attendance. |
-| 2 | Classes | Done | Title, description, discipline, defaults (duration, capacity), archive & restore toggle with filter for archived classes. |
-| 3 | Sessions inside classes | Done | Date, time, room, duration, capacity override, primary instructor assignment with validation. |
-| 4 | Booking lifecycle with rules | Done | Automatic waitlisting when capacity reached, auto-promotion on cancellation, settlement (`attended`/`no_show`) restricted to session end, expired membership rejection. |
-| 5 | Co-instructors | Done | Join table `session_co_instructors` with unique constraint; staff can assign/remove co-instructors; unified schedule view for instructors showing all primary and co-assigned sessions with role badges; co-instructors have settlement authorization. |
-| 6 | Finding bookings | Done | Dedicated Bookings view with server-side text search (member name/email), class filter, status filter, sorting (`createdAt`, `status`, `session`), and full server pagination with page controls. Scoped for instructors to assigned sessions. |
-| 7 | Recurring schedule generator | Done | Bulk-generates recurring weekly sessions across date range; conflict detection checks room overlaps and instructor (primary/co) overlaps; reports detailed summary of created vs skipped sessions with exact reasons; CSV attendance export endpoint & download button. |
-| 8 | Dashboard | Done | Landing view displays 4 headline metrics (Sessions Today, Bookings Made Today, No-Shows This Week, Members Waitlisted), interactive bookings breakdown by status and class, and an 8-week weekly attendance chart. |
-| 9 | History you cannot rewrite | Done | Immutable `booking_history` table recording every status transition, timestamp, and actor; staff can append permanent audit notes (`POST /api/bookings/:id/notes`); timeline modal in session and booking views. |
-| 10 | Expiring membership alerts | Done | Alerts view for members whose membership expires within $\le 7$ days or has passed, with count badge in navigation; staff can dismiss alerts for the current expiry date; renewing membership expiry resets dismissal so alerts re-appear in future cycles. |
+| 1 | Accounts and roles | Done | Staff and instructor roles are enforced via secure JWT middleware. Studio staff can assign primary and co-instructors, while instructors access their assigned session rosters and execute attendance settlements. |
+| 2 | Classes | Done | Comprehensive class catalog management including title, description, athletic discipline, default duration, default capacity, and archive/restore status with filter toggling. |
+| 3 | Sessions inside classes | Done | Full session scheduling supporting date, start time, room assignment, custom capacity overrides, and validated primary instructor assignments. |
+| 4 | Booking lifecycle with rules | Done | Automated waitlist placement upon reaching capacity, instant auto-promotion on cancellation, post-session attendance settlement (`attended`/`no_show`), and strict rejection of expired memberships. |
+| 5 | Co-instructors | Done | Relational `session_co_instructors` join table with uniqueness constraints. Staff can dynamically assign or remove co-instructors. Instructors benefit from a unified schedule displaying both primary and co-assigned sessions with role badges and authorized settlement privileges. |
+| 6 | Finding bookings | Done | Dedicated enterprise Bookings view with server-side text search (member name/email), multi-parameter filters (class, session, status), column sorting (`createdAt`, `status`, `session`), and server-side pagination controls. Roster visibility is automatically scoped for instructors. |
+| 7 | Recurring schedule generator | Done | Automated weekly recurring session generator across custom date ranges. Built-in conflict detection prevents room collisions and instructor double-booking (primary or co-instructor). Provides comprehensive generation audit summaries and one-click CSV attendance export. |
+| 8 | Dashboard | Done | Executive dashboard featuring four primary KPI cards (Sessions Today, Bookings Created Today, Weekly No-Shows, Active Waitlisted Members), real-time booking status breakdown, and an 8-week historical attendance trend chart. |
+| 9 | History you cannot rewrite | Done | Immutable `booking_history` audit ledger capturing every status transition, timestamp, and actor ID. Staff can append permanent audit notes (`POST /api/bookings/:id/notes`) viewable in an interactive timeline modal. |
+| 10 | Expiring membership alerts | Done | Proactive membership alerts view highlighting memberships expiring within 7 days or already lapsed, integrated with a live navigation counter badge. Staff can dismiss alerts for current cycles; renewing expiration dates automatically reactivates monitoring for subsequent cycles. |
 
 ### Stretch Features Implemented
 
 | # | Feature | Status | Notes |
 |---|---------|--------|-------|
-| S1 | Public class schedule page | Done | Unauthenticated public timetable endpoint `GET /api/public/schedule` and responsive frontend (`PublicSchedule.tsx`). Real-time availability indicator ("X spots left" vs "Waitlist Only"), discipline filter pills, date selector, instructor and co-instructor badges, and guest sign-in CTA. Accessible via Login page and Navbar. |
-| S2 | Instructor payroll based on sessions taught | Done | Staff endpoint `GET /api/reports/payroll` and frontend (`Payroll.tsx`). Calculates total earnings for finished sessions taught within customizable date range. Configurable primary rate ($50) and co-instructor rate ($35), KPI summary cards, instructor breakdown table, expandable itemized session audit drawer, and one-click CSV export. |
-| S3 | Room utilization reporting | Done | Staff endpoint `GET /api/reports/room-utilization` and frontend (`RoomUtilization.tsx`). Computes room occupancy %, booked classroom hours vs customizable daily operating window (e.g. 12h/day), member capacity fill rate %, and peak-time distribution (Morning, Afternoon, Evening). |
+| S1 | Public class schedule page | Done | Unauthenticated public timetable endpoint (`GET /api/public/schedule`) and responsive public interface (`PublicSchedule.tsx`). Displays real-time spot availability, discipline filter chips, date selector, instructor rosters, and direct authentication entry points. |
+| S2 | Instructor payroll based on sessions taught | Done | Instructor payroll reporting engine (`GET /api/reports/payroll`) and management portal (`Payroll.tsx`). Calculates compensation for completed sessions taught across custom date windows. Features configurable base rates (₹50 primary / ₹35 co-instructor), executive KPI cards, itemized session audit drawers, and one-click CSV export. |
+| S3 | Room utilization reporting | Done | Studio room utilization analytics (`GET /api/reports/room-utilization`) and visualization interface (`RoomUtilization.tsx`). Analyzes room occupancy percentages, booked classroom hours against customizable operational windows (e.g., 12 hours/day), member capacity fill rates, and peak usage distributions (Morning, Afternoon, Evening). |
 
 ## How much time did you actually spend?
 
-Around 7–8 hours total, split into:
-- 1.5 hours: Architecture review, database schema expansion (co-instructors join table, alert dismissal tracking, audit history).
-- 2.5 hours: Backend API development and business logic validation (schedule generator conflict detection, pagination, settlement role access, CSV export, analytics aggregation).
-- 2.5 hours: Frontend UI engineering (responsive Bookings view, Membership Alerts center, Dashboard analytics cards & 8-week chart, recurring generator modal, co-instructor management).
-- 1 hour: End-to-end integration testing and automated verification.
+Approximately 7–8 hours total, allocated as follows:
+- 1.5 hours: Architecture review, database schema design, and constraint modeling (co-instructor relations, alert dismissal tracking, and immutable audit history).
+- 2.5 hours: Backend API development and business logic validation (schedule generator conflict detection, pagination, role-based settlement authorization, CSV export, and analytics aggregation).
+- 2.5 hours: Frontend UI engineering (responsive Bookings view, Membership Alerts center, Dashboard analytics cards & 8-week chart, recurring generator modal, and co-instructor management).
+- 1 hour: End-to-end integration testing, visual regression verification, and automated build verification.
 
 ## What would you do next, with another 12 hours?
 
-1. **Email / SMS Notification Queue**: Integrate Resend or Twilio with a background job queue (e.g. BullMQ / Redis) to dispatch automated notifications when a waitlisted member is auto-promoted or when their membership enters the 7-day expiry window.
-2. **WebSocket / SSE Live Updates**: Implement Server-Sent Events (SSE) or WebSockets so when front desk staff books or cancels a spot, the roster and waitlist counts update in real-time on all instructor screens without page refresh.
-3. **Calendar View & Drag-and-Drop Rescheduling**: Build a full weekly visual calendar grid (FullCalendar / custom grid) allowing studio staff to visualize room occupancy, spot open slots, and drag sessions to reschedule.
-4. **Member Self-Service Portal**: Create a public/member-facing view where studio members can log in, view available classes, self-book, check waitlist rank, and cancel bookings prior to cutoff windows.
+1. **Automated Messaging & Notification Queue**: Integrate transactional email and SMS dispatch (e.g., Resend, Twilio) backed by a Redis/BullMQ background queue to immediately notify waitlisted members upon auto-promotion or membership expiration.
+2. **Real-Time WebSocket State Synchronization**: Deploy Server-Sent Events (SSE) or WebSockets to broadcast live booking updates, capacity shifts, and check-ins across staff and instructor dashboards without requiring manual polling.
+3. **Interactive Visual Calendar Grid**: Implement a full interactive weekly timetable grid (e.g., drag-and-drop rescheduling, multi-room calendar views) for effortless studio schedule planning.
+4. **Member Self-Service Portal**: Expand the public interface into a dedicated member portal where clients can authenticate, self-book sessions, monitor waitlist rankings, and manage account preferences.
 
 ## What are you least happy with in this codebase, and why?
 
-- **Database Round-Trip Latency for Analytics**: While the 8-week attendance aggregation query was optimized using `Promise.all`, running 8 date-range count queries against cloud-hosted PostgreSQL (Supabase free-tier) can experience slight network latency compared to a single pre-aggregated SQL materialized view or a single `crosstab` / `generate_series` SQL CTE. In a high-traffic production system, we would maintain an hourly aggregated rollup table or Redis cache for dashboard metrics.
-- **Express 5 Param Types**: In Express 5, `req.params` values are typed as `string | string[]`, requiring manual defensive parsing (`getIdParam`) in route handlers rather than schema-inferred validated types like Zod or tRPC would provide end-to-end.
+- **Database Round-Trip Latency for Analytics Rollups**: While the 8-week attendance aggregation query was optimized using `Promise.all`, executing multiple date-range queries against cloud-hosted PostgreSQL introduces network round-trip overhead. In an enterprise-scale production environment, this would be addressed using pre-aggregated SQL materialized views, continuous rollup tables, or Redis caching.
+- **Express 5 Route Parameter Type Inference**: In Express 5, `req.params` values resolve as `string | string[]`, requiring defensive runtime parsing utilities rather than schema-inferred, end-to-end validated type definitions (e.g., via Zod or tRPC).
