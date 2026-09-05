@@ -6,8 +6,11 @@ import {
   Check, 
   Menu, 
   X, 
-  Lock
+  Lock,
+  Clock,
+  BookOpen
 } from 'lucide-react';
+import { ArticleModal, EditorialArticle } from '../components/ArticleModal';
 
 interface LandingProps {
   onOpenTimetable: () => void;
@@ -16,6 +19,7 @@ interface LandingProps {
 
 export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState<EditorialArticle | null>(null);
 
   const programs = [
     {
@@ -60,27 +64,185 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
     }
   ];
 
-  const editorialArticles = [
+  const editorialArticles: EditorialArticle[] = [
     {
+      id: 'strength-principles',
       badge: 'TRAINING',
+      tagline: 'BIOMECHANICS & NEUROMUSCULAR DRIVE',
       title: '5 Principles Every Athlete Must Master for Peak Strength',
       description: 'Mastering progressive overload, bar path acceleration, and compound movement mechanics under tension.',
       image: '/images/photo-strength.jpg',
-      room: 'Studio C'
+      room: 'Studio C • Functional Rig',
+      readTime: '4 MIN READ',
+      author: 'Victor Chanda',
+      authorRole: 'Head Strength Coach & Studio Founder',
+      authorInitials: 'VC',
+      publishDate: 'V Fitness Research Lab',
+      sections: [
+        {
+          heading: '1. Progressive Overload Beyond Just Adding Weight',
+          body: [
+            'Progressive overload is commonly misunderstood as simply adding iron plates to the barbell week after week. In advanced athletic conditioning, forced linear progression inevitably leads to structural stagnation or connective tissue wear.',
+            'True progressive overload encompasses four distinct mechanical vectors: increasing time-under-tension (such as enforced 3-second eccentric descents), tightening intra-set rest intervals to train phosphocreatine resynthesis, elevating functional range of motion under tension, and executing higher mechanical volume with zero breakdown in movement mechanics.'
+          ],
+          quote: 'Strength is not an ego metric — it is the coordinated mastery of neuromuscular tension under unforgiving load.'
+        },
+        {
+          heading: '2. Bar Path Optimization & Moment Arm Elimination',
+          body: [
+            'Every millimeter a barbell drifts away from your anatomical center of mass creates an artificial moment arm. This multiplies rotational shear stress on vulnerable passive ligaments while bleeding kinetic force that should be driving the weight upward.',
+            'In our Studio C functional rig, we utilize bar velocity feedback and kinetic video analysis. Whether executing a conventional pull or a high-bar back squat, keeping the bar path strictly perpendicular over the midfoot maximizes work efficiency and protects the axial skeleton.'
+          ]
+        },
+        {
+          heading: '3. Maximal Concentric Intent Across All Percentages',
+          body: [
+            'Moving the barbell with maximal explosive intent during the concentric ascent — even when handling warm-up loads of 60% 1RM — recruits high-threshold Type IIx fast-twitch motor units.',
+            'If you move a light weight slowly, you train your nervous system to fire lethargically. Aggressively driving through the floor on every repetition programs high-velocity motor recruitment patterns that translate directly to personal records when maxing out.'
+          ]
+        },
+        {
+          heading: '4. Joint Centration & Kinetic Torsional Torque',
+          body: [
+            'Stabilizing joints before initiating movement is the foundation of injury prevention. In the squat, athletes must externally rotate the femurs into the acetabulum ("screwing your feet into the platform") to activate the gluteus medius and stabilize the pelvis.',
+            'Similarly, during heavy pressing, athletes must actively "break the bar" to engage the latissimus dorsi, packing the scapulae and centrating the humeral head in the glenoid fossa.'
+          ]
+        },
+        {
+          heading: '5. Systemic Recovery as a Non-Negotiable Training Variable',
+          body: [
+            'You do not adapt inside the gym; you induce microtrauma. Systemic muscular supercompensation and myofibrillar repair occur during deep stage-3 non-REM slow-wave sleep and strategic metabolic replenishment.',
+            'When weekly tonnage outpaces autonomic recovery, sympathetic nervous system overdrive elevates cortisol, impairs immune function, and degrades joint lubrication. Planned deload weeks every 5th to 6th cycle are not a sign of weakness — they are the mark of an elite athlete.'
+          ]
+        }
+      ],
+      keyTakeaways: [
+        'Record working sets from the side profile to audit vertical bar path alignment over the midfoot.',
+        'Enforce a strict 2-3 second eccentric descent on every compound lift to develop kinetic control.',
+        'Apply maximal concentric drive on all working reps regardless of bar percentage.',
+        'Protect joint capsules by establishing external rotational torque at the hips and shoulders before lifting.',
+        'Treat 8 hours of restorative sleep as an equally critical training variable as your heaviest set.'
+      ],
+      relatedClassTitle: 'HIIT & STRENGTH • Studio C',
+      relatedClassCta: 'VIEW STRENGTH SESSIONS'
     },
     {
+      id: 'nutrition-timing',
       badge: 'NUTRITION',
+      tagline: 'PERI-WORKOUT FUELING & RECOVERY',
       title: 'What to Eat Before and After Training for Maximum Performance',
       description: 'Optimizing macronutrient timing, cellular hydration, and post-session glycogen replenishment for clean recovery.',
       image: '/images/photo-nutrition.jpg',
-      room: 'Nutrition Bar'
+      room: 'V Nutrition Bar',
+      readTime: '5 MIN READ',
+      author: 'Priya Patel',
+      authorRole: 'Performance Nutrition Specialist',
+      authorInitials: 'PP',
+      publishDate: 'V Fitness Clinical Nutrition',
+      sections: [
+        {
+          heading: '1. The Pre-Training Glycogen Saturation Window (90–120 Mins)',
+          body: [
+            'Attempting high-intensity metabolic work or heavy compound lifting with depleted glycogen reserves accelerates muscle catabolism and triggers early central fatigue.',
+            'Between 90 and 120 minutes prior to your training session, consume a low-to-moderate glycemic meal designed for clean gastric emptying. Focus on 45–60 grams of complex carbohydrates paired with 25–30 grams of lean, bioavailable protein.'
+          ],
+          bulletPoints: [
+            'Ideal Carb Sources: Rolled oats, jasmine rice, sweet potato mash, or sourdough bread.',
+            'Ideal Protein Sources: Grilled chicken breast, pasture-raised egg whites, or high-protein paneer.',
+            'Keep dietary fats below 10g and avoid heavy raw cruciferous vegetables to eliminate gastric sluggishness.'
+          ]
+        },
+        {
+          heading: '2. The 20-Minute Pre-Ignition Fuel & Osmotic Hydration',
+          body: [
+            'If you train at 6:00 AM or more than 3 hours after a whole-food meal, your circulating blood glucose will be low. 15 to 20 minutes prior to warm-up, ingest 20–25 grams of fast-acting simple carbohydrates.',
+            'A ripe banana with a pinch of Himalayan pink salt or two Medjool dates provides instant glucose for ATP production without triggering insulin crashes. Combine with 400ml of water and 300mg of sodium to optimize blood plasma volume.'
+          ],
+          quote: 'Hydration is not merely water intake — it is intracellular osmotic pressure regulated by essential sodium, potassium, and magnesium ions.'
+        },
+        {
+          heading: '3. Intra-Session Electrolyte Preservation',
+          body: [
+            'In our climate-controlled studios, sweat rates during 50-minute HIIT or Bhangra Cardio sessions routinely exceed 1 liter per hour. Drinking un-mineralized plain water dilutes serum electrolytes, causing cellular hyponatremia and muscular cramping.',
+            'Sip 750ml of water containing 500mg sodium, 200mg potassium, and essential branched-chain amino acids (BCAAs) throughout intense sessions to preserve muscular pump and delay perceived exertion.'
+          ]
+        },
+        {
+          heading: '4. The Post-Workout Anabolic Rebound (Within 45 Mins)',
+          body: [
+            'Directly following training, muscle cell membranes exhibit heightened GLUT4 glucose transporter activity and elevated ribosomal protein synthesis sensitivity. This is the optimal window to initiate cellular repair.',
+            'Consume 30–35 grams of rapid-digesting protein containing at least 3 grams of the essential amino acid leucine to turn on the mTOR molecular switch. Pair with 50–70 grams of high-glycemic carbohydrates to trigger an insulin spike, rapidly driving amino acids into depleted muscle tissue.'
+          ],
+          bulletPoints: [
+            'Stop by the V Nutrition Bar for a cold-pressed whey isolate shake with blended dates and blueberries.',
+            'Plant-based athletes: Pair organic pea and brown rice protein with tart cherry juice for antioxidant recovery.',
+            'Continue rehydrating until your urine is pale straw in color over the subsequent 4 hours.'
+          ]
+        }
+      ],
+      keyTakeaways: [
+        'Fuel 90-120 minutes out with complex carbs and lean protein, keeping dietary fats low.',
+        'Ingest 20-25g of rapid simple carbs (dates, ripe banana) 20 minutes before training.',
+        'Add 500mg sodium to your intra-workout water bottle to maintain cellular osmotic pressure.',
+        'Deliver 30-35g of high-leucine protein within 45 minutes of completing your final set.',
+        'Utilize tart cherry extract or cold-pressed juices to reduce delayed onset muscle soreness (DOMS).'
+      ],
+      relatedClassTitle: 'V NUTRITION BAR & RECOVERY LOUNGE',
+      relatedClassCta: 'EXPLORE STUDIO AMENITIES'
     },
     {
+      id: 'relentless-consistency',
       badge: 'MINDSET',
+      tagline: 'BEHAVIORAL PSYCHOLOGY & HABIT LOOPS',
       title: 'How to Stay Relentlessly Consistent When Motivation Runs Out',
       description: 'Building unbreakable training systems, habit loops, and mental resilience when physical fatigue sets in.',
       image: '/images/photo-mindset.jpg',
-      room: 'Studio B'
+      room: 'Studio B • Mind & Core',
+      readTime: '4 MIN READ',
+      author: 'Aarav Mehta',
+      authorRole: 'Athletic Mindset & Mobility Coach',
+      authorInitials: 'AM',
+      publishDate: 'V Fitness Performance Mindset',
+      sections: [
+        {
+          heading: '1. Motivation is an Unreliable Emotion; Systems are Permanent',
+          body: [
+            'Motivation is a neurochemical spike driven by novelty — a new pair of lifting shoes, a compelling video, or an ambitious resolution. But dopamine is inherently homeostatic; it inevitably returns to baseline when you face an exhausting workday or broken sleep.',
+            'Elite performers do not wait to "feel motivated." They build behavioral systems where discipline replaces emotional whim. When training is embedded into your calendar as a non-negotiable professional meeting with yourself, decision fatigue disappears.'
+          ],
+          quote: 'You do not rise to the level of your goals. You fall to the level of your training systems.'
+        },
+        {
+          heading: '2. The 2-Minute Friction Reduction Architecture',
+          body: [
+            'Behavioral friction is the primary barrier to sustainable fitness habits. If you wake up and have to find your clean workout apparel, locate your studio pass, and decide what workout to perform, your brain will choose the path of least resistance.',
+            'Eliminate every friction point before bedtime: pack your studio gym bag, lay out your shoes, and reserve your spot in the V Fitness Studio timetable 7 days in advance. When the friction to show up is lower than the friction to cancel, consistency becomes automatic.'
+          ]
+        },
+        {
+          heading: '3. Minimum Viable Workouts & The Unbroken Chain',
+          body: [
+            'One of the most destructive mental traps is the all-or-nothing dichotomy: "If I cannot do my full 60-minute heavy session, I will just skip today." This breaks the neurological habit loop.',
+            'On days when your energy or schedule is at 30%, showing up to complete 25 minutes of restorative mobility and controlled core work in Studio B preserves your athletic identity. You cast a vote for your consistency, keeping the momentum intact.'
+          ]
+        },
+        {
+          heading: '4. The Psychology of the Studio Cohort',
+          body: [
+            'Human beings are evolutionary pack animals. When you train alone in a generic gym with headphones on, skipping a session carries zero social consequence. Nobody noticed you were missing.',
+            'In our studio classes, your coaches and lane partners know your name. When you miss a class, your absence is felt. Training inside a dedicated community transforms solitary suffering into shared athletic triumph.'
+          ]
+        }
+      ],
+      keyTakeaways: [
+        'Never rely on emotional motivation; calendarize your studio appointments 7 days in advance.',
+        'Pack your gym bag and prep hydration the night before to eliminate morning decision friction.',
+        'Adopt the Minimum Viable Workout mentality: 20 minutes of movement beats 0 minutes every time.',
+        'Leverage the community cohort effect: training alongside peers increases long-term adherence by 84%.',
+        'Shift your mindset from "I have to exercise" to "I am an athlete who respects my body."'
+      ],
+      relatedClassTitle: 'YOGA & MOBILITY • Studio B',
+      relatedClassCta: 'VIEW MOBILITY SESSIONS'
     }
   ];
 
@@ -637,17 +799,28 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
             </button>
           </div>
 
-          {/* 3-Photo Grid (Matches the 3 photographic cards in reference) */}
+          {/* 3-Photo Grid (Interactive Editorial Articles) */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '1.75rem'
           }}>
-            {editorialArticles.map((article, idx) => (
+            {editorialArticles.map((article) => (
               <div 
-                key={idx}
+                key={article.id}
                 className="photo-card"
-                onClick={onOpenTimetable}
+                onClick={() => setSelectedArticle(article)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedArticle(article);
+                  }
+                }}
+                style={{
+                  cursor: 'pointer'
+                }}
               >
                 <div className="photo-card-img-wrap">
                   <img 
@@ -655,16 +828,52 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                     alt={article.title}
                     className="photo-card-img"
                   />
+                  <div style={{
+                    position: 'absolute',
+                    top: '0.85rem',
+                    right: '0.85rem',
+                    backgroundColor: 'rgba(7, 8, 11, 0.78)',
+                    backdropFilter: 'blur(8px)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '4px',
+                    padding: '0.25rem 0.6rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    fontSize: '0.7rem',
+                    fontWeight: 700,
+                    color: 'rgba(255, 255, 255, 0.85)',
+                    letterSpacing: '0.04em'
+                  }}>
+                    <Clock size={11} color="var(--crimson-primary)" />
+                    {article.readTime}
+                  </div>
                 </div>
                 
                 <div style={{ padding: '1.75rem', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
                   <div>
-                    <span className="photo-card-badge">
-                      {article.badge}
-                    </span>
-                    <h3 className="photo-card-title" style={{ marginBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                      <span className="photo-card-badge">
+                        {article.badge}
+                      </span>
+                      <span style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600 }}>
+                        {article.room}
+                      </span>
+                    </div>
+
+                    <h3 className="photo-card-title" style={{ marginBottom: '0.45rem' }}>
                       {article.title}
                     </h3>
+
+                    <div style={{
+                      fontSize: '0.75rem',
+                      color: 'rgba(255, 255, 255, 0.5)',
+                      fontWeight: 600,
+                      marginBottom: '0.85rem'
+                    }}>
+                      By {article.author} • {article.authorRole}
+                    </div>
+
                     <p style={{
                       color: 'rgba(255, 255, 255, 0.65)',
                       fontSize: '0.85rem',
@@ -684,8 +893,40 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                     fontSize: '0.75rem',
                     color: 'rgba(255, 255, 255, 0.5)'
                   }}>
-                    <span>V Fitness Studio • {article.room}</span>
-                    <span style={{ color: 'var(--crimson-primary)', fontWeight: 700 }}>READ MORE →</span>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                      <BookOpen size={13} color="var(--crimson-primary)" />
+                      Complete Guide
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedArticle(article);
+                      }}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        padding: 0,
+                        color: 'var(--crimson-primary)',
+                        fontWeight: 800,
+                        fontSize: '0.78rem',
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                        transition: 'transform 0.2s ease, color 0.2s ease'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.color = '#ffffff';
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.color = 'var(--crimson-primary)';
+                      }}
+                    >
+                      READ MORE →
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1144,6 +1385,18 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
           </div>
         </div>
       </footer>
+
+      {/* ── Editorial Article Reader Modal ────────────────────────────────────── */}
+      {selectedArticle && (
+        <ArticleModal
+          article={selectedArticle}
+          onClose={() => setSelectedArticle(null)}
+          onBookClass={() => {
+            setSelectedArticle(null);
+            onOpenTimetable();
+          }}
+        />
+      )}
 
     </div>
   );
