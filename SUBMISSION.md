@@ -1,7 +1,5 @@
 # Submission
 
-Fill this in and commit it. This is the first file we open.
-
 ## Links
 
 - **GitHub repository:** https://github.com/victorchanda345-tech/v-fitness-studio
@@ -41,8 +39,6 @@ Fill this in and commit it. This is the first file we open.
 | Hosting | Vercel (Frontend SPA) + Render (Node.js API) + Supabase (Managed PostgreSQL) | Modern cloud architecture with global edge CDN caching and scalable managed database infrastructure |
 
 ## Goal checklist
-
-Mark each honestly. Partial is fine — say what is partial.
 
 | # | Goal | Status | Notes |
 |---|------|--------|-------|
