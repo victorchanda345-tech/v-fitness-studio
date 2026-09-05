@@ -306,24 +306,146 @@ export const Login: React.FC<LoginProps> = ({ onViewSchedule, onBackToHome }) =>
           </button>
         </form>
 
-        {/* Evaluator Quick Hint */}
+        {/* Evaluator Quick Hint & 1-Click Fill */}
         <div style={{
           marginTop: '1.25rem',
-          padding: '0.75rem 0.95rem',
+          padding: '0.85rem 1rem',
           backgroundColor: 'rgba(255, 255, 255, 0.03)',
-          border: '1px dashed rgba(255, 255, 255, 0.12)',
-          borderRadius: '6px',
-          fontSize: '0.75rem',
-          color: 'rgba(255, 255, 255, 0.65)',
+          border: '1px dashed rgba(255, 255, 255, 0.15)',
+          borderRadius: '8px',
+          fontSize: '0.78rem',
+          color: 'rgba(255, 255, 255, 0.7)',
           lineHeight: 1.45
         }}>
           {portalMode === 'member' ? (
             <div>
-              <strong style={{ color: '#ffffff' }}>Demo Member Sign-In:</strong> Use email <code style={{ color: 'var(--crimson-primary)' }}>rahul@example.com</code> with password <code style={{ color: 'var(--crimson-primary)' }}>password123</code> to access member schedule.
+              <div style={{ fontWeight: 700, color: '#ffffff', marginBottom: '0.4rem' }}>
+                Quick Fill Member Credentials:
+              </div>
+              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('victorchanda345@gmail.com');
+                    setPassword('password123');
+                  }}
+                  style={{
+                    background: 'rgba(229, 36, 36, 0.15)',
+                    border: '1px solid rgba(229, 36, 36, 0.35)',
+                    borderRadius: '4px',
+                    padding: '0.25rem 0.6rem',
+                    color: '#ffffff',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  victorchanda345@gmail.com
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('rahul@example.com');
+                    setPassword('password123');
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '4px',
+                    padding: '0.25rem 0.6rem',
+                    color: '#ffffff',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Rahul Sharma
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('sneha@example.com');
+                    setPassword('password123');
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '4px',
+                    padding: '0.25rem 0.6rem',
+                    color: '#ffffff',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Sneha Rao
+                </button>
+              </div>
             </div>
           ) : (
             <div>
-              <strong style={{ color: '#ffffff' }}>Demo Staff Sign-In:</strong> Use <code style={{ color: 'var(--crimson-primary)' }}>admin@vfitness.com</code> with <code style={{ color: 'var(--crimson-primary)' }}>admin123</code> to access full operations dashboard.
+              <div style={{ fontWeight: 700, color: '#ffffff', marginBottom: '0.4rem' }}>
+                Quick Fill Staff &amp; Instructor Credentials:
+              </div>
+              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('victor@vfitness.com');
+                    setPassword('password123');
+                  }}
+                  style={{
+                    background: 'rgba(229, 36, 36, 0.15)',
+                    border: '1px solid rgba(229, 36, 36, 0.35)',
+                    borderRadius: '4px',
+                    padding: '0.25rem 0.6rem',
+                    color: '#ffffff',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Victor (Manager)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('aarav@vfitness.com');
+                    setPassword('password123');
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '4px',
+                    padding: '0.25rem 0.6rem',
+                    color: '#ffffff',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Aarav (Instructor)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEmail('admin@vfitness.com');
+                    setPassword('admin123');
+                  }}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '4px',
+                    padding: '0.25rem 0.6rem',
+                    color: '#ffffff',
+                    fontSize: '0.72rem',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Admin
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -42,6 +42,24 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successBooking, setSuccessBooking] = useState<MemberSelfServiceBooking | null>(null);
+  const [existingBooking, setExistingBooking] = useState<MemberSelfServiceBooking | null>(null);
+  const [cancellingExisting, setCancellingExisting] = useState(false);
+  const [cancelMessage, setCancelMessage] = useState<string | null>(null);
+
+  const checkExistingBooking = async (emailToCheck: string) => {
+    if (!emailToCheck || !session) return;
+    try {
+      const res = await api.getMemberOnlineBookings(emailToCheck);
+      const found = res.bookings?.find(
+        (b) => b.sessionId === session.id && (b.status === 'booked' || b.status === 'waitlisted')
+      );
+      if (found) {
+        setExistingBooking(found);
+      }
+    } catch {
+      // Ignore lookup failure
+    }
+  };
 
   useEffect(() => {
     if (currentMember) {
@@ -54,18 +72,52 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
     if (isOpen) {
       setError(null);
       setSuccessBooking(null);
-      if (currentMember) {
+      setExistingBooking(null);
+      setCancelMessage(null);
+      if (currentMember?.email) {
         setEmail(currentMember.email);
         setName(currentMember.name);
+        checkExistingBooking(currentMember.email);
       }
     }
   }, [isOpen, session, currentMember]);
 
   if (!isOpen || !session) return null;
 
+  const handleEmailBlur = () => {
+    const clean = email.trim().toLowerCase();
+    if (clean && !existingBooking) {
+      checkExistingBooking(clean);
+    }
+  };
+
+  const handleCancelExistingSpot = async () => {
+    if (!existingBooking) return;
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) return;
+    if (!window.confirm('Are you sure you want to cancel your reservation for this class session?')) return;
+
+    try {
+      setCancellingExisting(true);
+      setError(null);
+      await api.cancelMemberOnlineBooking(existingBooking.id, cleanEmail);
+      setExistingBooking(null);
+      setCancelMessage('Your reservation for this session was cancelled. The spot has been released.');
+      onBookingComplete({
+        ...existingBooking,
+        status: 'cancelled',
+      });
+    } catch (err: any) {
+      setError(err.message || 'Failed to cancel spot');
+    } finally {
+      setCancellingExisting(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setCancelMessage(null);
 
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail) {
@@ -96,7 +148,27 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
       onBookingComplete(res.booking);
     } catch (err: any) {
       const errMsg = err.message || 'Failed to complete booking';
-      if (errMsg.toLowerCase().includes('not registered') || errMsg.toLowerCase().includes('provide your full name')) {
+      if (errMsg.toLowerCase().includes('already have an active booking')) {
+        setError(null);
+        await checkExistingBooking(cleanEmail);
+        // Fallback active booking object so the user sees the friendly confirmation view immediately
+        setExistingBooking((prev) => prev || {
+          id: 0,
+          sessionId: session.id,
+          status: errMsg.includes('WAITLISTED') ? 'waitlisted' : 'booked',
+          createdAt: new Date().toISOString(),
+          session: {
+            id: session.id,
+            classTitle: session.classTitle,
+            discipline: session.discipline,
+            date: session.date,
+            startTime: session.startTime,
+            duration: session.duration,
+            room: session.room,
+            primaryInstructor: session.primaryInstructor,
+          }
+        });
+      } else if (errMsg.toLowerCase().includes('not registered') || errMsg.toLowerCase().includes('provide your full name')) {
         setIsNewMember(true);
         setError('New to V Fitness Studio? Please enter your full name below to activate your member access.');
       } else {
@@ -321,9 +393,127 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
                 </button>
               </div>
             </div>
+          ) : existingBooking ? (
+            /* Active Reservation Screen (when member already booked) */
+            <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                backgroundColor: existingBooking.status === 'booked' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+                border: existingBooking.status === 'booked' ? '1px solid #10b981' : '1px solid #f59e0b',
+                color: existingBooking.status === 'booked' ? '#10b981' : '#f59e0b',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.25rem',
+              }}>
+                {existingBooking.status === 'booked' ? <CheckCircle2 size={36} /> : <Users size={32} />}
+              </div>
+
+              <h4 className="font-display" style={{ fontSize: '1.5rem', color: '#ffffff', marginBottom: '0.45rem' }}>
+                {existingBooking.status === 'booked' ? 'YOU ALREADY HAVE A CONFIRMED SPOT!' : 'YOU ARE ON THE WAITLIST!'}
+              </h4>
+
+              <p style={{ color: 'rgba(255, 255, 255, 0.75)', fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+                {existingBooking.status === 'booked'
+                  ? `You already hold a confirmed reservation for ${session.classTitle} on ${session.date} at ${session.startTime}. Your spot is secured and ready!`
+                  : `You are already registered on the waitlist for ${session.classTitle} on ${session.date}. If a spot opens up, you will be promoted automatically.`}
+              </p>
+
+              <div style={{
+                backgroundColor: '#111319',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: '8px',
+                padding: '1rem',
+                marginBottom: '1.75rem',
+                fontSize: '0.85rem',
+                textAlign: 'left',
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.5)' }}>Member Email:</span>
+                  <span style={{ color: '#ffffff', fontWeight: 700 }}>{email}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.5)' }}>Studio Space:</span>
+                  <span style={{ color: '#ffffff', fontWeight: 700 }}>{session.room}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.5)' }}>Coach:</span>
+                  <span style={{ color: '#ffffff', fontWeight: 700 }}>{session.primaryInstructor}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: 'rgba(255, 255, 255, 0.5)' }}>Reservation Status:</span>
+                  <span style={{
+                    color: existingBooking.status === 'booked' ? '#34d399' : '#fbbf24',
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                  }}>
+                    {existingBooking.status === 'booked' ? '✓ CONFIRMED SPOT' : `WAITLIST POSITION #${existingBooking.waitlistPosition || 1}`}
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenMyBookings();
+                  }}
+                  className="btn-crimson"
+                  style={{ padding: '0.75rem 1.4rem', fontSize: '0.85rem' }}
+                >
+                  VIEW IN MY BOOKINGS →
+                </button>
+                {existingBooking.id > 0 && (
+                  <button
+                    type="button"
+                    disabled={cancellingExisting}
+                    onClick={handleCancelExistingSpot}
+                    className="btn-athletic-outline"
+                    style={{
+                      padding: '0.75rem 1.25rem',
+                      fontSize: '0.85rem',
+                      color: '#f87171',
+                      borderColor: 'rgba(239, 68, 68, 0.35)',
+                    }}
+                  >
+                    {cancellingExisting ? 'CANCELLING SPOT…' : 'CANCEL THIS SPOT'}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="btn-athletic-outline"
+                  style={{ padding: '0.75rem 1.25rem', fontSize: '0.85rem' }}
+                >
+                  CLOSE
+                </button>
+              </div>
+            </div>
           ) : (
             /* Booking Form */
             <form onSubmit={handleSubmit}>
+
+              {/* Feedback Alert for Cancellations */}
+              {cancelMessage && (
+                <div style={{
+                  backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                  border: '1px solid rgba(16, 185, 129, 0.35)',
+                  color: '#a7f3d0',
+                  padding: '0.85rem 1rem',
+                  borderRadius: '6px',
+                  fontSize: '0.85rem',
+                  marginBottom: '1.25rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.65rem',
+                }}>
+                  <CheckCircle2 size={18} color="#34d399" />
+                  <span>{cancelMessage}</span>
+                </div>
+              )}
 
               {/* Error Message */}
               {error && (
@@ -348,9 +538,11 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
               {/* Form Inputs */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div>
-                  <label htmlFor="member-email" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgba(255, 255, 255, 0.85)', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'block', marginBottom: '0.4rem' }}>
-                    Member Email Address *
-                  </label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                    <label htmlFor="member-email" style={{ fontSize: '0.78rem', fontWeight: 700, color: 'rgba(255, 255, 255, 0.85)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Member Email Address *
+                    </label>
+                  </div>
                   <input
                     id="member-email"
                     type="email"
@@ -358,6 +550,7 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
                     placeholder="e.g. rahul@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    onBlur={handleEmailBlur}
                     style={{
                       width: '100%',
                       backgroundColor: '#14161F',
@@ -368,6 +561,31 @@ export const MemberBookingModal: React.FC<MemberBookingModalProps> = ({
                       fontSize: '0.9rem',
                     }}
                   />
+                  {/* Quick Select Chips for Quick Testing */}
+                  <div style={{ display: 'flex', gap: '0.35rem', marginTop: '0.45rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.4)' }}>Quick select:</span>
+                    {['victorchanda345@gmail.com', 'rahul@example.com', 'sneha@example.com'].map((mEmail) => (
+                      <button
+                        key={mEmail}
+                        type="button"
+                        onClick={() => {
+                          setEmail(mEmail);
+                          checkExistingBooking(mEmail);
+                        }}
+                        style={{
+                          background: email.toLowerCase() === mEmail.toLowerCase() ? 'rgba(229, 36, 36, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                          border: email.toLowerCase() === mEmail.toLowerCase() ? '1px solid var(--crimson-primary)' : '1px solid rgba(255, 255, 255, 0.1)',
+                          borderRadius: '4px',
+                          padding: '0.2rem 0.5rem',
+                          fontSize: '0.7rem',
+                          color: email.toLowerCase() === mEmail.toLowerCase() ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {mEmail.split('@')[0]}
+                      </button>
+                    ))}
+                  </div>
                 </div>
 
                 {(isNewMember || !currentMember) && (

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { MemberBookingModal } from '../components/MemberBookingModal';
 import { MemberPortalModal } from '../components/MemberPortalModal';
-import { MemberProfile } from '../api/client';
+import { MemberProfile, MemberSelfServiceBooking } from '../api/client';
 
 interface PublicScheduleProps {
   onSignInClick?: () => void;
@@ -289,13 +289,38 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
     }
   });
 
+  const [memberBookings, setMemberBookings] = useState<MemberSelfServiceBooking[]>([]);
+
+  const loadMemberBookings = async (memberEmail: string) => {
+    if (!memberEmail) {
+      setMemberBookings([]);
+      return;
+    }
+    try {
+      const res = await api.getMemberOnlineBookings(memberEmail);
+      setMemberBookings(res.bookings || []);
+    } catch {
+      setMemberBookings([]);
+    }
+  };
+
+  useEffect(() => {
+    if (currentMember?.email) {
+      loadMemberBookings(currentMember.email);
+    } else {
+      setMemberBookings([]);
+    }
+  }, [currentMember?.email]);
+
   const handleMemberChange = (member: MemberProfile | null) => {
     setCurrentMember(member);
     try {
       if (member) {
         localStorage.setItem('vfitness_member_profile', JSON.stringify(member));
+        loadMemberBookings(member.email);
       } else {
         localStorage.removeItem('vfitness_member_profile');
+        setMemberBookings([]);
       }
     } catch {}
   };
@@ -809,32 +834,101 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
 
                       {/* Member Self-Service Booking Action Button */}
                       <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.85rem' }}>
-                        <button 
-                          type="button"
-                          onClick={() => {
-                            setSelectedBookingSession(s);
-                            setBookingModalOpen(true);
-                          }}
-                          className={s.isFull ? 'btn btn-secondary btn-sm' : 'btn btn-primary btn-sm'} 
-                          style={{ 
-                            width: '100%', 
-                            justifyContent: 'center',
-                            padding: '0.65rem 1rem',
-                            fontWeight: 700,
-                            letterSpacing: '0.04em',
-                            textTransform: 'uppercase'
-                          }}
-                        >
-                          {s.isFull ? (
-                            <>
-                              <Users size={14} /> Join Waitlist ({s.waitlistedCount} Waiting)
-                            </>
-                          ) : (
-                            <>
-                              <CalendarCheck size={14} /> Book Class Spot ({s.spotsRemaining} Left) →
-                            </>
-                          )}
-                        </button>
+                        {(() => {
+                          const mb = memberBookings.find(
+                            (b) => b.sessionId === s.id && (b.status === 'booked' || b.status === 'waitlisted')
+                          );
+                          if (mb?.status === 'booked') {
+                            return (
+                              <button 
+                                type="button"
+                                onClick={() => {
+                                  setSelectedBookingSession(s);
+                                  setBookingModalOpen(true);
+                                }}
+                                style={{ 
+                                  width: '100%', 
+                                  justifyContent: 'center',
+                                  padding: '0.65rem 1rem',
+                                  fontWeight: 700,
+                                  letterSpacing: '0.04em',
+                                  textTransform: 'uppercase',
+                                  backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                                  border: '1px solid rgba(16, 185, 129, 0.4)',
+                                  color: '#34d399',
+                                  borderRadius: '6px',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.45rem',
+                                  fontSize: '0.8rem'
+                                }}
+                              >
+                                <CheckCircle2 size={15} color="#34d399" />
+                                ✓ YOU ARE BOOKED (VIEW SPOT)
+                              </button>
+                            );
+                          }
+                          if (mb?.status === 'waitlisted') {
+                            return (
+                              <button 
+                                type="button"
+                                onClick={() => {
+                                  setSelectedBookingSession(s);
+                                  setBookingModalOpen(true);
+                                }}
+                                style={{ 
+                                  width: '100%', 
+                                  justifyContent: 'center',
+                                  padding: '0.65rem 1rem',
+                                  fontWeight: 700,
+                                  letterSpacing: '0.04em',
+                                  textTransform: 'uppercase',
+                                  backgroundColor: 'rgba(245, 158, 11, 0.15)',
+                                  border: '1px solid rgba(245, 158, 11, 0.4)',
+                                  color: '#fbbf24',
+                                  borderRadius: '6px',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '0.45rem',
+                                  fontSize: '0.8rem'
+                                }}
+                              >
+                                <Users size={15} color="#fbbf24" />
+                                WAITLIST #{mb.waitlistPosition || 1} (VIEW SPOT)
+                              </button>
+                            );
+                          }
+                          return (
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                setSelectedBookingSession(s);
+                                setBookingModalOpen(true);
+                              }}
+                              className={s.isFull ? 'btn btn-secondary btn-sm' : 'btn btn-primary btn-sm'} 
+                              style={{ 
+                                width: '100%', 
+                                justifyContent: 'center',
+                                padding: '0.65rem 1rem',
+                                fontWeight: 700,
+                                letterSpacing: '0.04em',
+                                textTransform: 'uppercase'
+                              }}
+                            >
+                              {s.isFull ? (
+                                <>
+                                  <Users size={14} /> Join Waitlist ({s.waitlistedCount} Waiting)
+                                </>
+                              ) : (
+                                <>
+                                  <CalendarCheck size={14} /> Book Class Spot ({s.spotsRemaining} Left) →
+                                </>
+                              )}
+                            </button>
+                          );
+                        })()}
                       </div>
                     </div>
                   ))}
@@ -903,7 +997,16 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
         onMemberIdentified={handleMemberChange}
         onBookingComplete={(b) => {
           refreshSchedule();
-          setToastMessage(b.status === 'booked' ? 'Class spot confirmed successfully!' : 'Added to waitlist!');
+          if (currentMember?.email) {
+            loadMemberBookings(currentMember.email);
+          }
+          setToastMessage(
+            b.status === 'booked' 
+              ? 'Class spot confirmed successfully!' 
+              : b.status === 'cancelled' 
+              ? 'Booking cancelled successfully.' 
+              : 'Added to waitlist!'
+          );
           setTimeout(() => setToastMessage(null), 4000);
         }}
         onOpenMyBookings={() => {
@@ -921,6 +1024,9 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
         onBrowseClasses={() => setMemberPortalOpen(false)}
         onBookingCancelled={() => {
           refreshSchedule();
+          if (currentMember?.email) {
+            loadMemberBookings(currentMember.email);
+          }
         }}
       />
     </div>

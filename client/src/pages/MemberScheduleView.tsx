@@ -34,6 +34,10 @@ export const MemberScheduleView: React.FC<MemberScheduleViewProps> = ({ initialT
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
+
   const loadData = async () => {
     if (!user) return;
     try {
@@ -79,10 +83,19 @@ export const MemberScheduleView: React.FC<MemberScheduleViewProps> = ({ initialT
 
       await loadData();
     } catch (err: any) {
-      setMessage({
-        type: 'error',
-        text: err.message || 'Failed to book session.',
-      });
+      const errMsg = err.message || 'Failed to book session.';
+      if (errMsg.toLowerCase().includes('already have an active booking')) {
+        setMessage({
+          type: 'success',
+          text: `You already hold an active reservation for "${session.classTitle}"! Check the "My Bookings" tab above to view or cancel your spot.`,
+        });
+        await loadData();
+      } else {
+        setMessage({
+          type: 'error',
+          text: errMsg,
+        });
+      }
     } finally {
       setActionLoadingId(null);
     }
