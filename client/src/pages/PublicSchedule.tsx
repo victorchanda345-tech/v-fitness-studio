@@ -289,18 +289,18 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
             gap: '0.45rem',
             padding: '0.3rem 0.85rem',
             borderRadius: '20px',
-            background: isSyncing ? 'rgba(59, 130, 246, 0.12)' : 'rgba(16, 185, 129, 0.12)',
-            border: `1px solid ${isSyncing ? 'rgba(59, 130, 246, 0.28)' : 'rgba(16, 185, 129, 0.28)'}`,
+            background: isSyncing ? 'rgba(229, 36, 36, 0.14)' : 'rgba(16, 185, 129, 0.12)',
+            border: `1px solid ${isSyncing ? 'rgba(229, 36, 36, 0.35)' : 'rgba(16, 185, 129, 0.28)'}`,
             fontSize: '0.8rem',
-            color: isSyncing ? '#60a5fa' : '#34d399',
+            color: isSyncing ? '#ff8585' : '#34d399',
             fontWeight: 500,
           }}>
             <span style={{
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              background: isSyncing ? '#60a5fa' : '#34d399',
-              boxShadow: isSyncing ? '0 0 8px #3b82f6' : '0 0 8px #10b981',
+              background: isSyncing ? '#ff8585' : '#34d399',
+              boxShadow: isSyncing ? '0 0 8px #E52424' : '0 0 8px #10b981',
             }} />
             {isSyncing ? 'Syncing latest live spot availability…' : 'Live availability synchronized'}
           </span>

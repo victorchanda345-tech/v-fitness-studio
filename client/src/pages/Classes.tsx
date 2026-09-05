@@ -185,7 +185,7 @@ export const Classes: React.FC<ClassesProps> = ({ onNavigate }) => {
             >
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                  <span className="badge badge-booked" style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', borderColor: 'rgba(59, 130, 246, 0.3)' }}>
+                  <span className="badge" style={{ background: 'rgba(229, 36, 36, 0.15)', color: '#ff8585', borderColor: 'rgba(229, 36, 36, 0.35)' }}>
                     {c.discipline}
                   </span>
                   {c.isArchived && (

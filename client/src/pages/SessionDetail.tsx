@@ -433,7 +433,7 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
             display: 'flex',
             gap: '1.25rem',
             padding: '1rem 1.5rem',
-            background: 'rgba(15, 23, 42, 0.7)',
+            background: 'rgba(13, 14, 19, 0.85)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-subtle)',
           }}>
@@ -615,7 +615,7 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
 
           <div style={{
             padding: '0.75rem',
-            background: 'rgba(15, 23, 42, 0.6)',
+            background: 'rgba(13, 14, 19, 0.8)',
             borderRadius: 'var(--radius-md)',
             fontSize: '0.825rem',
             color: 'var(--text-secondary)',
@@ -706,7 +706,7 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
                   key={log.id}
                   style={{
                     padding: '0.85rem',
-                    background: 'rgba(15, 23, 42, 0.6)',
+                    background: 'rgba(13, 14, 19, 0.8)',
                     borderRadius: 'var(--radius-md)',
                     borderLeft: '3px solid var(--accent-primary)',
                   }}
@@ -790,8 +790,8 @@ export const SessionDetail: React.FC<SessionDetailProps> = ({ sessionId, onBack 
           <div style={{
             padding: '0.75rem 1rem',
             borderRadius: 'var(--radius-md)',
-            background: 'rgba(59, 130, 246, 0.08)',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
+            background: 'rgba(229, 36, 36, 0.08)',
+            border: '1px solid rgba(229, 36, 36, 0.25)',
             fontSize: '0.825rem',
             color: 'var(--text-secondary)',
           }}>

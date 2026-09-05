@@ -39,8 +39,9 @@ export const Modal: React.FC<ModalProps> = ({
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(5, 8, 15, 0.75)',
-      backdropFilter: 'blur(8px)',
+      backgroundColor: 'rgba(5, 6, 9, 0.82)',
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -52,11 +53,11 @@ export const Modal: React.FC<ModalProps> = ({
         style={{
           width: '100%',
           maxWidth,
-          backgroundColor: '#111827',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
+          backgroundColor: '#0D0E13',
+          border: '1px solid rgba(229, 36, 36, 0.28)',
           borderRadius: 'var(--radius-lg)',
           overflow: 'hidden',
-          boxShadow: 'var(--shadow-lg)',
+          boxShadow: '0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(229, 36, 36, 0.12)',
         }}
       >
         {/* Header */}

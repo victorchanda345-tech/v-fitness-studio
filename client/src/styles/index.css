@@ -135,7 +135,7 @@ label {
 input, select, textarea {
   font-family: inherit;
   font-size: 0.9rem;
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(13, 14, 19, 0.85);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   color: var(--text-primary);
@@ -250,7 +250,7 @@ input:focus, select:focus, textarea:focus {
 .nav-pill-group {
   display: flex;
   align-items: center;
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(13, 14, 19, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-full);
@@ -332,15 +332,15 @@ input:focus, select:focus, textarea:focus {
 }
 
 .badge-staff {
-  background: rgba(99, 102, 241, 0.14);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: #a5b4fc;
+  background: rgba(229, 36, 36, 0.16);
+  border-color: rgba(229, 36, 36, 0.38);
+  color: #ff8585;
 }
 
 .badge-instructor {
-  background: rgba(14, 165, 233, 0.12);
-  border-color: rgba(14, 165, 233, 0.28);
-  color: #7dd3fc;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
 }
 
 /* ── Live Pulse Indicator ────────────────────────────────────────────────── */
@@ -399,7 +399,7 @@ table {
 
 th {
   padding: 0.85rem 1.15rem;
-  background: rgba(14, 20, 34, 0.95);
+  background: rgba(13, 14, 19, 0.98);
   font-weight: 600;
   font-size: 0.75rem;
   text-transform: uppercase;

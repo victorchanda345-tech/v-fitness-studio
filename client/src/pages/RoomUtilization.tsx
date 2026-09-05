@@ -241,8 +241,8 @@ export const RoomUtilization: React.FC = () => {
                         height: '100%', 
                         width: `${Math.min(100, room.utilizationRate)}%`,
                         background: room.utilizationRate > 60 
-                          ? 'linear-gradient(90deg, #3b82f6, #8b5cf6)' 
-                          : 'linear-gradient(90deg, #10b981, #3b82f6)',
+                          ? 'linear-gradient(90deg, #E52424, #B91C1C)' 
+                          : 'linear-gradient(90deg, #10b981, #E52424)',
                         borderRadius: '4px' 
                       }} 
                     />
@@ -286,7 +286,7 @@ export const RoomUtilization: React.FC = () => {
 
                     <div style={{ padding: '0.6rem 0.4rem', borderRadius: '6px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border-subtle)' }}>
                       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.2rem' }}>
-                        <Sunset size={14} color="#3b82f6" />
+                        <Sunset size={14} color="#E52424" />
                       </div>
                       <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Afternoon</div>
                       <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>{room.peakTimes.afternoonCount}</div>

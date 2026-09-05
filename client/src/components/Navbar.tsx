@@ -219,8 +219,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, alertsC
               height: '30px',
               borderRadius: '50%',
               background: user?.role === 'staff' 
-                ? 'linear-gradient(135deg, #6366f1 0%, #4338ca 100%)'
-                : 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+                ? 'linear-gradient(135deg, #E52424 0%, #991B1B 100%)'
+                : 'linear-gradient(135deg, #4B5563 0%, #1F2937 100%)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',

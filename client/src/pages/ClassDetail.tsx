@@ -405,8 +405,8 @@ export const ClassDetail: React.FC<ClassDetailProps> = ({
           <div style={{
             padding: '0.75rem 1rem',
             borderRadius: 'var(--radius-md)',
-            background: 'rgba(59, 130, 246, 0.08)',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
+            background: 'rgba(229, 36, 36, 0.08)',
+            border: '1px solid rgba(229, 36, 36, 0.25)',
             fontSize: '0.825rem',
             color: 'var(--text-secondary)',
           }}>

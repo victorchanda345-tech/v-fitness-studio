@@ -73,7 +73,7 @@ export const Sessions: React.FC<SessionsProps> = ({ onNavigateToSession }) => {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
           {!isStaff && (
-            <div style={{ display: 'inline-flex', background: 'rgba(15, 23, 42, 0.6)', padding: '0.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+            <div style={{ display: 'inline-flex', background: 'rgba(13, 14, 19, 0.85)', padding: '0.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
               <button
                 type="button"
                 onClick={() => setRoleFilter('all')}

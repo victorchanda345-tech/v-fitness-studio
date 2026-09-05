@@ -323,7 +323,7 @@ export const Payroll: React.FC = () => {
                   {/* Expandable itemized sessions row */}
                   {isExpanded && (
                     <tr>
-                      <td colSpan={6} style={{ background: 'rgba(15, 23, 42, 0.4)', padding: '1rem 1.5rem' }}>
+                      <td colSpan={6} style={{ background: 'rgba(13, 14, 19, 0.6)', padding: '1rem 1.5rem' }}>
                         <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem', color: 'var(--text-primary)' }}>
                           Itemized Sessions Taught by {inst.instructorName}:
                         </div>
