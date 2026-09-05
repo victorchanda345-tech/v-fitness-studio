@@ -22,6 +22,7 @@ interface PublicScheduleProps {
   onBackToHome?: () => void;
   initialRoom?: string;
   initialInstructor?: string;
+  initialDiscipline?: string;
 }
 
 const formatYMD = (d: Date) => {
@@ -251,6 +252,46 @@ export const matchesInstructorName = (sessionInstructor: string, filterInstructo
   return false;
 };
 
+export const matchesDiscipline = (sessionDiscipline: string, filterDiscipline: string, classTitle?: string): boolean => {
+  if (!filterDiscipline || filterDiscipline === 'all') return true;
+  const sDisc = (sessionDiscipline || '').toLowerCase().trim();
+  const fDisc = (filterDiscipline || '').toLowerCase().trim();
+  const title = (classTitle || '').toLowerCase().trim();
+
+  if (sDisc === fDisc) return true;
+  if (sDisc && fDisc && (sDisc.includes(fDisc) || fDisc.includes(sDisc))) return true;
+
+  // HIIT & Strength / Cardio cross-category matching
+  const isHiitStrengthFilter = fDisc.includes('hiit') || fDisc.includes('strength') || fDisc.includes('cardio');
+  const isHiitStrengthSession = sDisc.includes('hiit') || sDisc.includes('strength') || sDisc.includes('cardio') || title.includes('hiit') || title.includes('strength') || title.includes('circuit') || title.includes('conditioning');
+  if (isHiitStrengthFilter && isHiitStrengthSession && !title.includes('dance') && !title.includes('bhangra') && sDisc !== 'dance') {
+    return true;
+  }
+
+  // Bhangra & Dance
+  const isDanceFilter = fDisc.includes('dance') || fDisc.includes('bhangra');
+  const isDanceSession = sDisc.includes('dance') || sDisc.includes('bhangra') || title.includes('dance') || title.includes('bhangra');
+  if (isDanceFilter && isDanceSession) {
+    return true;
+  }
+
+  // Pilates & Core
+  const isPilatesFilter = fDisc.includes('pilates') || fDisc.includes('core');
+  const isPilatesSession = sDisc.includes('pilates') || sDisc.includes('core') || title.includes('pilates') || title.includes('core');
+  if (isPilatesFilter && isPilatesSession) {
+    return true;
+  }
+
+  // Yoga & Mobility
+  const isYogaFilter = fDisc.includes('yoga') || fDisc.includes('mobility');
+  const isYogaSession = sDisc.includes('yoga') || sDisc.includes('mobility') || title.includes('yoga') || title.includes('mobility');
+  if (isYogaFilter && isYogaSession) {
+    return true;
+  }
+
+  return false;
+};
+
 export const COACH_OPTIONS = [
   { id: 'all', label: 'All Coaches' },
   { id: 'Victor Chanda', label: 'Victor Chanda • Head Coach' },
@@ -265,7 +306,8 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
   onBackToApp,
   onBackToHome,
   initialRoom = 'all',
-  initialInstructor = 'all'
+  initialInstructor = 'all',
+  initialDiscipline = 'all'
 }) => {
   const { user } = useAuth();
   const initialData = getCachedSchedule();
@@ -342,12 +384,18 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
   };
 
   // Filters
-  const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
+  const [selectedDiscipline, setSelectedDiscipline] = useState<string>(initialDiscipline);
   const [selectedRoom, setSelectedRoom] = useState<string>(initialRoom);
   const [selectedInstructor, setSelectedInstructor] = useState<string>(initialInstructor);
   const [selectedDateFilter, setSelectedDateFilter] = useState<string>('');
 
   // Keep filters in sync if props change
+  useEffect(() => {
+    if (initialDiscipline) {
+      setSelectedDiscipline(initialDiscipline);
+    }
+  }, [initialDiscipline]);
+
   useEffect(() => {
     if (initialRoom) {
       setSelectedRoom(initialRoom);
@@ -393,8 +441,7 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
 
   // Filtered sessions
   const filteredSessions = sessions.filter((s) => {
-    const matchesDiscipline =
-      selectedDiscipline === 'all' || s.discipline.toLowerCase() === selectedDiscipline.toLowerCase();
+    const matchesDisc = matchesDiscipline(s.discipline, selectedDiscipline, s.classTitle);
     const matchesDate = !selectedDateFilter || s.date === selectedDateFilter;
     
     const sessionRoomNorm = normalizeRoom(s.room);
@@ -409,7 +456,7 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
       matchesInstructorName(s.primaryInstructor, selectedInstructor) ||
       (Array.isArray(s.coInstructors) && s.coInstructors.some((co) => matchesInstructorName(co, selectedInstructor)));
 
-    return matchesDiscipline && matchesDate && matchesRoom && matchesInstructor;
+    return matchesDisc && matchesDate && matchesRoom && matchesInstructor;
   });
 
   // Group by date for readable agenda view
@@ -601,17 +648,20 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
               >
                 All Disciplines
               </button>
-              {disciplines.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => setSelectedDiscipline(d)}
-                  className={`btn ${selectedDiscipline.toLowerCase() === d.toLowerCase() ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-                  style={{ borderRadius: '20px', padding: '0.35rem 0.85rem', fontSize: '0.78rem' }}
-                >
-                  {d}
-                </button>
-              ))}
+              {disciplines.map((d) => {
+                const isActive = selectedDiscipline !== 'all' && matchesDiscipline(d, selectedDiscipline);
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    onClick={() => setSelectedDiscipline(d)}
+                    className={`btn ${isActive ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                    style={{ borderRadius: '20px', padding: '0.35rem 0.85rem', fontSize: '0.78rem' }}
+                  >
+                    {d}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Date Picker Filter */}
@@ -636,6 +686,56 @@ export const PublicSchedule: React.FC<PublicScheduleProps> = ({
 
         </div>
       </div>
+
+      {/* Active Discipline Indicator Banner */}
+      {selectedDiscipline !== 'all' && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0.85rem 1.25rem',
+          borderRadius: '6px',
+          backgroundColor: 'rgba(229, 36, 36, 0.08)',
+          border: '1px solid rgba(229, 36, 36, 0.3)',
+          marginBottom: '1.25rem',
+          flexWrap: 'wrap',
+          gap: '0.75rem'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '4px',
+              backgroundColor: 'var(--crimson-primary)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#ffffff'
+            }}>
+              <CalendarCheck size={15} />
+            </div>
+            <div>
+              <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#ffffff' }}>
+                Showing Classes for {selectedDiscipline.toUpperCase()}
+              </div>
+              <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)' }}>
+                {filteredSessions.length === 0 
+                  ? `No upcoming classes currently scheduled for ${selectedDiscipline} with active filters` 
+                  : `Displaying ${filteredSessions.length} session${filteredSessions.length === 1 ? '' : 's'} in the ${selectedDiscipline} program`}
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setSelectedDiscipline('all')}
+            className="btn btn-secondary btn-sm"
+            style={{ fontSize: '0.75rem', padding: '0.35rem 0.85rem' }}
+          >
+            Show All Disciplines (Clear)
+          </button>
+        </div>
+      )}
 
       {/* Active Studio Room Indicator Banner */}
       {selectedRoom !== 'all' && (

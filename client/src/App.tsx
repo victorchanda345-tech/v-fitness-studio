@@ -29,6 +29,7 @@ const MainApp: React.FC = () => {
   const [publicView, setPublicView] = useState<PublicView>('landing');
   const [selectedStudioRoom, setSelectedStudioRoom] = useState<string>('all');
   const [selectedInstructor, setSelectedInstructor] = useState<string>('all');
+  const [selectedDiscipline, setSelectedDiscipline] = useState<string>('all');
 
   // Ensure member lands on upcoming sessions
   useEffect(() => {
@@ -83,10 +84,12 @@ const MainApp: React.FC = () => {
         <PublicSchedule 
           initialRoom={selectedStudioRoom}
           initialInstructor={selectedInstructor}
+          initialDiscipline={selectedDiscipline}
           onSignInClick={() => setPublicView('login')} 
           onBackToHome={() => {
             setSelectedStudioRoom('all');
             setSelectedInstructor('all');
+            setSelectedDiscipline('all');
             setPublicView('landing');
           }}
         />
@@ -99,11 +102,13 @@ const MainApp: React.FC = () => {
           onViewSchedule={() => {
             setSelectedStudioRoom('all');
             setSelectedInstructor('all');
+            setSelectedDiscipline('all');
             setPublicView('timetable');
           }} 
           onBackToHome={() => {
             setSelectedStudioRoom('all');
             setSelectedInstructor('all');
+            setSelectedDiscipline('all');
             setPublicView('landing');
           }}
         />
@@ -112,9 +117,10 @@ const MainApp: React.FC = () => {
 
     return (
       <Landing 
-        onOpenTimetable={(studioRoom?: string, instructor?: string) => {
+        onOpenTimetable={(studioRoom?: string, instructor?: string, discipline?: string) => {
           setSelectedStudioRoom(studioRoom || 'all');
           setSelectedInstructor(instructor || 'all');
+          setSelectedDiscipline(discipline || 'all');
           setPublicView('timetable');
         }}
         onOpenLogin={() => setPublicView('login')}

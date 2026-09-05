@@ -17,7 +17,7 @@ import { MemberPortalModal } from '../components/MemberPortalModal';
 import { MemberProfile } from '../api/client';
 
 interface LandingProps {
-  onOpenTimetable: (studioRoom?: string, instructor?: string) => void;
+  onOpenTimetable: (studioRoom?: string, instructor?: string, discipline?: string) => void;
   onOpenLogin: () => void;
 }
 
@@ -52,8 +52,8 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
       number: '01',
       title: 'HIIT & STRENGTH',
       tag: 'METABOLIC POWER',
+      discipline: 'HIIT & Strength',
       description: 'Explosive functional circuits combining barbell power, kettlebells, and cardio intervals to maximize EPOC calorie burn and stamina.',
-      room: 'Studio C',
       duration: '45 mins',
       image: '/images/program-hiit.jpg',
       isFeatured: false
@@ -62,8 +62,8 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
       number: '02',
       title: 'PILATES CORE',
       tag: 'POSTURE & CONTROL',
+      discipline: 'Pilates',
       description: 'Controlled mat-based conditioning targeting the deep core, pelvic alignment, and spine stabilization without joint compression.',
-      room: 'Studio B',
       duration: '50 mins',
       image: '/images/program-pilates.jpg',
       isFeatured: false
@@ -72,18 +72,18 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
       number: '03',
       title: 'YOGA & MOBILITY',
       tag: 'ATHLETIC RECOVERY',
+      discipline: 'Yoga',
       description: 'Dynamic vinyasa flows and functional joint mobility designed to lubricate tissue, expand range of motion, and sharpen mental focus.',
-      room: 'Studio B',
       duration: '60 mins',
       image: '/images/program-yoga.jpg',
-      isFeatured: true
+      isFeatured: false
     },
     {
       number: '04',
       title: 'BHANGRA CARDIO',
       tag: 'HIGH-ENERGY DANCE',
+      discipline: 'Dance',
       description: 'Electrifying music-driven dance workout fusing athletic tempo and rhythmic cardio conditioning for an exhilarating sweat session.',
-      room: 'Studio A',
       duration: '50 mins',
       image: '/images/program-bhangra.jpg',
       isFeatured: false
@@ -724,9 +724,6 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                     }}>
                       {prog.tag}
                     </span>
-                    <span style={{ fontSize: '0.7rem', color: 'rgba(255, 255, 255, 0.45)', fontWeight: 600 }}>
-                      {prog.room}
-                    </span>
                   </div>
 
                   <h3 className="font-display" style={{
@@ -760,7 +757,7 @@ export const Landing: React.FC<LandingProps> = ({ onOpenTimetable, onOpenLogin }
                   </span>
                   <button
                     type="button"
-                    onClick={() => onOpenTimetable(prog.room)}
+                    onClick={() => onOpenTimetable(undefined, undefined, prog.discipline)}
                     style={{
                       background: 'transparent',
                       border: 'none',
